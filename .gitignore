@@ -1,0 +1,7 @@
+# Local test data and secrets — never commit
+server/data/
+server/.env
+.env
+.DS_Store
+Thumbs.db
+*.log
