@@ -84,7 +84,7 @@ This VM's headless Chrome intermittently stalls in-page `fetch()` calls that car
 
 ## 9. Deploy status
 - Preview deployed and live: `https://fm95i9em.autoclawai.space/` (HTTP 200, Bengali homepage content verified over HTTPS; 10/10 core live checks).
-- Stable URL allocated: `https://rf25y7rn.autoclawai.space/` (serves the site after the user clicks **Publish** in the app).
+- Stable URL allocated: `https://iamatiq7.github.io/spus_website/` (serves the site after the user clicks **Publish** in the app).
 - A follow-up redeploy carrying the SEO domain patch (sitemap/robots/canonical/og now point at the stable domain) and the three performance optimizations above is queued via `projects/projects.json` (updatedAt 2026-09-09T05:10Z+); the optimization was re-verified locally on the identical code (scores above). The auto-preview channel serves static files only, so the Node backend (`server/`) is not part of the preview — it is included for self-hosting.
 
 ## 8. Test summary counts

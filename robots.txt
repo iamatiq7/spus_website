@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin.html
 
-Sitemap: https://rf25y7rn.autoclawai.space/sitemap.xml
+Sitemap: https://iamatiq7.github.io/spus_website/sitemap.xml
