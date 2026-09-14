@@ -30,6 +30,17 @@ Everything a non-developer admin needs to run this website long-term.
 - Committee is **year-based**: create a new committee entry for each year; old ones stay browsable in the archive.
 - Results connect to fixtures: add the fixture first, then the result (fixture link optional).
 
+## 3b. Publishing admin edits permanently (GitHub flow)
+
+Admin edits are browser-local on static hosting. To publish them for **all visitors, permanently**:
+
+1. Make your edits in the admin panel.
+2. **Settings → ⬇ Download content.json (live update file)**.
+3. Put the downloaded `content.json` in this folder's root (replace the old one).
+4. Commit + push (GitHub Desktop). Live for everyone within ~1 minute.
+
+Delete `content.json` from the repo to return to the seed data. A full backup (submissions included) and JSON import are also available in the same panel.
+
 ## 4. Where submissions live & how to export
 
 **Static preview mode** (AutoClaw preview): submissions are saved in the visitor browser's `localStorage`

@@ -518,7 +518,10 @@
         '<div class="fld"><label>' + E(T(kk)) + '</label><input type="number" id="st-' + k + '" value="' + (stats[k] || 0) + '"></div>').join("") +
       '</div><button class="btn btn--primary" type="submit">' + E(T("a_save")) + "</button></form></div>" +
       '<div class="panel form-panel"><h2>' + E(T("a_password_change")) + '</h2><form class="admin-form" id="pw-form"><div class="fld"><label>' + E(T("a_new_password")) + '</label><input id="np" type="password" minlength="6" required></div><button class="btn btn--primary" type="submit">' + E(T("a_save")) + "</button></form></div>" +
-      '<div class="panel"><h2>💾 ' + E(T("a_export_json")) + " / " + E(T("a_import_json")) + '</h2>' +
+      '<div class="panel"><h2>📦 ' + E(T("a_content_title")) + '</h2>' +
+      '<ol class="muted small" style="padding-left:1.2em"><li>' + E(T("a_content_s1")) + '</li><li>' + E(T("a_content_s2")) + '</li><li>' + E(T("a_content_s3")) + '</li></ol>' +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 18px"><button class="btn btn--primary btn--sm" id="exp-content">⬇ ' + E(T("a_dl_content")) + '</button></div>' +
+      '<h2 style="font-size:1rem">💾 ' + E(T("a_full_backup")) + '</h2>' +
       '<p class="muted small">' + E(T("a_local_note")) + '</p>' +
       '<div class="fld" style="max-width:420px"><label>সার্ভার API কী / Server API key (ADMIN_PASSWORD)</label><div style="display:flex;gap:8px"><input id="api-key" value="' + E(localStorage.getItem("spus_api_key") || "") + '"><button class="btn btn--outline btn--sm" type="button" id="save-key">' + E(T("a_save")) + '</button></div><p class="muted small">সার্ভার মোডে জমা পড়তে ও যাচাই/ডিলিট করতে এই কী লাগবে। / Required to read & verify server-mode submissions.</p></div>' +
       '<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn--outline btn--sm" id="exp">⬇ ' + E(T("a_export_json")) + '</button>' +
@@ -547,13 +550,24 @@
       localStorage.setItem("spus_api_key", body.querySelector("#api-key").value.trim());
       U.toast("✓ " + T("a_saved"));
     });
+    body.querySelector("#exp-content").addEventListener("click", () => {
+      U.download("content.json", JSON.stringify(S.contentSnapshot(), null, 2), "application/json");
+      U.toast("⬇ content.json — " + T("a_saved"));
+    });
     body.querySelector("#exp").addEventListener("click", () => {
       U.download("spus-data-backup-" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(S.exportAll(), null, 2), "application/json");
     });
     body.querySelector("#imp").addEventListener("change", e => {
       const f = e.target.files[0]; if (!f) return;
       const fr = new FileReader();
-      fr.onload = () => { try { S.importAll(JSON.parse(fr.result)); U.toast("✓ " + T("a_import_ok")); render(); } catch (err) { U.toast(T("a_import_err"), "error"); } };
+      fr.onload = () => {
+        try {
+          const b = JSON.parse(fr.result);
+          if (b && b.entities && b.kind === "spus-content") { S.importContentJson(b); }
+          else { S.importAll(b); }
+          U.toast("✓ " + T("a_import_ok")); render();
+        } catch (err) { U.toast(T("a_import_err"), "error"); }
+      };
       fr.readAsText(f);
     });
     body.querySelector("#reset").addEventListener("click", () => {

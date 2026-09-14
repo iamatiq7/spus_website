@@ -644,6 +644,6 @@
   /* ================= boot ================= */
   document.addEventListener("DOMContentLoaded", () => {
     const page = document.body.dataset.page || "error";
-    U.boot(main => (PAGES[page] || PAGES.error)(main));
+    window.SPUS_STORE.ready().then(() => U.boot(main => (PAGES[page] || PAGES.error)(main)));
   });
 })();

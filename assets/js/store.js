@@ -5,6 +5,7 @@
   const OVERLAY = "spus_overlay_";
   const SUBS = "spus_submissions";
   const SETTINGS = "spus_settings";
+  const IMPORTED = "spus_imported";
   const AUTH = "spus_auth";
   const LANG = "spus_lang";
   const ENTITIES = ["news", "events", "notices", "years", "sports", "tournaments", "teams", "players", "fixtures", "results", "standings", "committee", "gallery", "timeline", "donation_methods", "stats", "site", "about", "reports"];
@@ -25,12 +26,50 @@
     /* ---------- language ---------- */
     lang() { return localStorage.getItem(LANG) || "bn"; },
     setLang(l) { localStorage.setItem(LANG, l); },
+    /* ---------- published content file (content.json committed to the repo) ---------- */
+    contentLayer: null,
+    effBase(entity) {
+      const il = this.importedLayer();
+      if (il && Array.isArray(il.entities && il.entities[entity])) return il.entities[entity].slice();
+      if (this.contentLayer && Array.isArray(this.contentLayer.entities && this.contentLayer.entities[entity])) return this.contentLayer.entities[entity].slice();
+      return (window.SPUS_DATA[entity] || []).slice();
+    },
+    importedLayer() { return jget(IMPORTED, null); },
+    _loadContentFile() {
+      this.contentLayer = null;
+      try {
+        Promise.race([
+          fetch("content.json", { cache: "no-cache" }),
+          new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 2500))
+        ]).then(r => (r && r.ok ? r.json() : null)).then(c => {
+          if (c && c.kind === "spus-content") { this.contentLayer = c; window.dispatchEvent(new Event("spus-content-loaded")); }
+        }).catch(() => {});
+      } catch (e) { /* ignore */ }
+    },
+    ready() {
+      if (!this._readyP) this._readyP = Promise.race([
+        new Promise(res => window.addEventListener("spus-content-loaded", res, { once: true })),
+        new Promise(res => setTimeout(res, 4000))
+      ]);
+      return this._readyP;
+    },
+    /* Snapshot of all publishable content (what admin exports as content.json) */
+    contentSnapshot() {
+      const ents = ["news", "events", "notices", "sports", "tournaments", "teams", "players", "fixtures", "results", "standings", "committee", "gallery", "timeline", "reports"];
+      const entities = {};
+      ents.forEach(e => { entities[e] = this.list(e); });
+      return { kind: "spus-content", version: 2, at: new Date().toISOString(), entities: entities, settings: this.settings() };
+    },
+    importContentJson(bundle) {
+      if (!bundle || !bundle.entities || typeof bundle.entities !== "object") throw new Error("bad content bundle");
+      jset(IMPORTED, { kind: "spus-content", version: bundle.version || 2, at: bundle.at || new Date().toISOString(), entities: bundle.entities, settings: bundle.settings || {} });
+    },
     /* ---------- overlay CRUD ---------- */
     ov(entity) { return jget(OVERLAY + entity, { added: [], changed: {}, deleted: [] }); },
     saveOv(entity, ov) { jset(OVERLAY + entity, ov); },
     list(entity) {
       const ov = this.ov(entity);
-      const base = (window.SPUS_DATA[entity] || []).slice();
+      const base = this.effBase(entity);
       const out = [];
       base.forEach(r => { if (ov.deleted.indexOf(r.id) === -1) out.push(ov.changed[r.id] || r); });
       ov.added.forEach(r => { if (ov.deleted.indexOf(r.id) === -1) out.push(ov.changed[r.id] || r); });
@@ -48,7 +87,7 @@
     },
     del(entity, id) { const ov = this.ov(entity); ov.deleted.push(id); this.saveOv(entity, ov); },
     /* ---------- site settings / stats / donation methods / about (object-style overrides) ---------- */
-    settings() { return jget(SETTINGS, {}); },
+    settings() { const cs = (this.contentLayer && this.contentLayer.settings) || {}; const il = this.importedLayer(); const cis = (il && il.settings) || {}; return Object.assign({}, cs, cis, jget(SETTINGS, {})); },
     saveSettings(patch) { const s = this.settings(); Object.keys(patch).forEach(k => { s[k] = patch[k]; }); jset(SETTINGS, s); },
     site() {
       const o = this.settings();
@@ -151,10 +190,12 @@
     },
     resetDemo() {
       ENTITIES.forEach(e => localStorage.removeItem(OVERLAY + e));
-      localStorage.removeItem(SETTINGS); localStorage.removeItem(SUBS);
+      localStorage.removeItem(SETTINGS); localStorage.removeItem(SUBS); localStorage.removeItem(IMPORTED);
     },
     /* ---------- server detection ---------- */
     init() {
+      this.contentLayer = null;
+      this._loadContentFile();
       try {
         fetch("/api/ping").then(r => r.json()).then(d => { if (d && d.ok) this.serverMode = true; }).catch(() => {});
       } catch (e) { /* ignore */ }

@@ -40,6 +40,18 @@ Open `http://localhost:8080` (or `:3000`).
 > The static preview's login is browser-level (demo-grade). For real protection, self-host with the included Node
 > backend and keep the admin panel behind your host's access control (or extend `server/server.js` with sessions).
 
+## Making content permanent (GitHub Pages flow)
+
+The static host cannot store admin edits on the server — without this step, admin edits live only in the browser
+that made them (localStorage). To publish edits for **all visitors, permanently**:
+
+1. Log in at `/admin.html`, add/edit/remove content.
+2. **Settings → ⬇ Download content.json (live update file)**.
+3. Place that `content.json` in this folder's root (replace the old one).
+4. Commit + push (GitHub Desktop: Commit → Push origin). Live for everyone within ~1 minute.
+
+The site automatically loads `content.json` when present (delete the file to return to the seed data).
+
 ## Optional Node backend (real persistent submissions)
 
 ```bash
