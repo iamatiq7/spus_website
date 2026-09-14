@@ -12,7 +12,7 @@
 | T3 | Remove test `content.json` artifact (workspace project dir) | pending | Low | No test data committed to GitHub |
 | T4 | Document the publish flow in readme/handover | pending | Medium | Both docs explain the 3-step flow |
 | T5 | Sync updated files to the GitHub folder (Desktop) | pending | High | Folder contains the new JS (source + minified) and updated docs |
-| T6 | Push to GitHub + verify live serving of the new code | pending | High | `github.io` serves the new `store.min.js` (contains `spus-content` marker) |
+| T6 | ✅ Completed (2026-09-14) | Pushed via git with the user's GCM sign-in: remote main = `1551b64` (= local HEAD, verified via `git ls-remote`). GitHub Pages rebuilt and verified live: sitemap/canonical/OG on `https://iamatiq7.github.io/spus_website/`, content-system live in `store.min.js`. Rollback tag `backup-before-live-update` (94f78aa) pushed |
 | T7 | AutoClaw preview redeploy (perf/SEO optimizations queued) | blocked (platform queue) | Low | AutoClaw preview serves the optimized build — superseded by GitHub Pages live site |
 
 ## 2. Completion evidence
