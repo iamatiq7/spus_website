@@ -190,6 +190,9 @@
       '<div class="article-body">' + H(U.L(n, "body")) + "</div>" +
       shareLinks(url, U.L(n, "title")) + "</article>" +
       (related.length ? '<section class="section"><div class="container">' + sectionHead(T("article_related"), null) + '<div class="grid grid--3">' + related.map(U.newsCard).join("") + "</div></div></section>" : "");
+    document.title = U.L(n, "title") + " — " + S.site().name_bn;
+    const md = document.querySelector('meta[name="description"]');
+    if (md) md.setAttribute("content", U.L(n, "excerpt").slice(0, 160));
     document.getElementById("copy-link").addEventListener("click", () => { navigator.clipboard.writeText(url).then(() => U.toast("✓ " + T("copied"))); });
   };
 
@@ -209,6 +212,7 @@
         "<li><span>📍 " + E(T("event_location")) + "</span><strong>" + E(U.L(ev, "location")) + "</strong></li>" +
         "<li><span>🧑‍🤝‍🧑 " + E(T("organizer")) + "</span><strong>" + E(U.L(ev, "organizer")) + "</strong></li></ul>" +
         '<div class="article-body"><p>' + H(U.L(ev, "desc")) + "</p></div></article>";
+      document.title = U.L(ev, "title") + " — " + S.site().name_bn;
       return;
     }
     if (yr) list = list.filter(e => String(e.year) === yr);
@@ -341,6 +345,7 @@
       '<section class="section"><div class="container">' +
       '<div class="tabs">' + tabs.map(([k, kk]) => '<a class="tab' + (tab === k ? " is-active" : "") + '" href="tournament.html?t=' + E(t.slug) + "&tab=" + k + '">' + E(T(kk)) + "</a>").join("") + "</div>" +
       body + "</div></section>";
+    document.title = U.L(t, "name") + " — " + S.site().name_bn;
   };
   function standingsTable(st, teamMap, t) {
     const cricket = t.stat_columns === "cricket";
@@ -454,6 +459,7 @@
       '<div class="card pad" style="margin-top:2rem"><h2>' + E(T("tab_tournaments")) + '</h2><div class="stack">' + (tours.length ? tours.map(t => '<a class="row-link" href="tournament.html?t=' + E(t.slug) + '">' + E(U.L(t, "name")) + U.statusChip(t.status) + "</a>").join("") : empty("empty_tournaments")) + "</div></div>" +
       '<div class="card pad" style="margin-top:2rem"><h2>' + E(T("tab_results")) + '</h2><div class="stack">' + (results.length ? results.map(r => resultRow(r, S.list("teams"))).join("") : empty("empty_results")) + "</div></div>" +
       '<a class="text-link" href="players.html">← ' + E(T("players_title")) + "</a></div></section>";
+    document.title = U.L(p, "name") + " — " + S.site().name_bn;
   };
 
   /* ================= COMMITTEE ================= */
