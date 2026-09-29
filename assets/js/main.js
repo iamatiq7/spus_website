@@ -219,7 +219,7 @@
       '<section class="section"><div class="container">' +
       '<div class="filter-bar">' + sel("f-year", years.map(y => ({ v: y, l: U.num(y) })), yr, T("all_years")) +
       sel("f-status", statuses.map(s => ({ v: s, l: T("st_" + s) })), st, T("all_statuses")) + "</div>" +
-      '<div class="grid grid--3">' + (list.length ? list.map(U.eventCard).join("") : empty("empty_events")) + "</div></div></section>";
+      '<h2 class="sr-only">' + E(T("events_title")) + "</h2>" + '<div class="grid grid--3">' + (list.length ? list.map(U.eventCard).join("") : empty("empty_events")) + "</div></div></section>";
     bindFilters(["f-year", "f-status"], ["year", "status"], "events.html");
   };
 
@@ -244,7 +244,7 @@
     }
     main.innerHTML = '<section class="page-hero"><div class="container"><h1>' + E(T("archive_title")) + '</h1><p class="muted">' + E(T("archive_sub")) + '</p></div></section>' +
       '<section class="section"><div class="container">' +
-      '<div class="year-tabs" role="tablist">' + years.map(yy => '<a class="year-tab' + (String(yy) === y ? " is-active" : "") + '" href="archive.html?y=' + yy + '">' + U.num(yy) + "</a>").join("") + "</div>" +
+      '<div class="year-tabs">' + years.map(yy => '<a class="year-tab' + (String(yy) === y ? " is-active" : "") + '" href="archive.html?y=' + yy + '">' + U.num(yy) + "</a>").join("") + "</div>" +
       '<div class="archive-grid">' +
       mini(T("tab_news"), "news", '<div class="stack">' + aNews.map(n => '<a class="row-link" href="article.html?item=' + E(n.slug || n.id) + '">' + E(U.L(n, "title")) + '<time>' + U.fmtDate(n.date) + "</time></a>").join("") + "</div>", "news.html?year=" + y, "empty_news", aNews.length) +
       mini(T("tab_events"), "events", '<div class="stack">' + aEvents.map(e => '<a class="row-link" href="events.html?item=' + e.id + '">' + E(U.L(e, "title")) + "<time>" + U.fmtDate(e.date) + "</time></a>").join("") + "</div>", "events.html?year=" + y, "empty_events", aEvents.length) +
@@ -339,7 +339,7 @@
     const tabs = [["overview", "tab_overview"], ["fixtures", "tab_fixtures2"], ["results", "tab_results"], ["standings", "tab_standings"], ["players", "tab_players"], ["stats", "tab_stats2"], ["gallery", "tab_gallery"]];
     main.innerHTML = '<section class="page-hero"><div class="container"><div class="card-meta">' + U.statusChip(t.status) + " <span class='chip chip--cat'>" + E(sp.icon + " " + U.L(sp, "name")) + "</span></div><h1>" + E(U.L(t, "name")) + '</h1><p class="muted">' + U.fmtDate(t.start_date) + " – " + U.fmtDate(t.end_date) + " · " + E(U.L(t, "venue")) + "</p></div></section>" +
       '<section class="section"><div class="container">' +
-      '<div class="tabs" role="tablist">' + tabs.map(([k, kk]) => '<a class="tab' + (tab === k ? " is-active" : "") + '" href="tournament.html?t=' + E(t.slug) + "&tab=" + k + '">' + E(T(kk)) + "</a>").join("") + "</div>" +
+      '<div class="tabs">' + tabs.map(([k, kk]) => '<a class="tab' + (tab === k ? " is-active" : "") + '" href="tournament.html?t=' + E(t.slug) + "&tab=" + k + '">' + E(T(kk)) + "</a>").join("") + "</div>" +
       body + "</div></section>";
   };
   function standingsTable(st, teamMap, t) {
@@ -426,7 +426,7 @@
       sel("f-team", teams.map(t => ({ v: t.id, l: U.L(t, "name") })), tm, T("all_teams")) +
       sel("f-tour", tours.map(t => ({ v: t.id, l: U.L(t, "name") })), tr, T("all")) +
       sel("f-active", [{ v: "true", l: T("active") }, { v: "false", l: T("inactive") }], ac, T("all")) + "</div>" +
-      '<div class="grid grid--4">' + (list.length ? list.map(U.playerCard).join("") : empty("empty_players")) + "</div></div></section>";
+      '<h2 class="sr-only">' + E(T("players_title")) + "</h2>" + '<div class="grid grid--4">' + (list.length ? list.map(U.playerCard).join("") : empty("empty_players")) + "</div></div></section>";
     bindFilters(["f-sport", "f-team", "f-tour", "f-active"], ["sport", "team", "t", "active"], "players.html");
   };
 
@@ -492,7 +492,7 @@
       '<section class="section"><div class="container">' +
       '<div class="filter-bar">' + sel("f-year", years.map(y => ({ v: y, l: U.num(y) })), yr, T("all_years")) +
       sel("f-event", [].concat(S.list("tournaments"), events).map(x => ({ v: x.id, l: U.L(x, "name") })), ev, T("all")) + "</div>" +
-      '<div class="grid grid--3">' + (list.length ? list.map(g => '<a class="card album-card" href="gallery.html?album=' + g.id + '"><img loading="lazy" src="' + (g.cover || (g.photos[0] && g.photos[0].src) || U.img(g.id, 400, 280)) + '" alt=""><div class="card-body"><h3>' + E(U.L(g, "title")) + '</h3><p class="muted">' + U.fmtDate(g.date) + " · " + U.num(g.photos.length) + " " + E(T("photos")) + '</p></div><div class="album-count">▦ ' + U.num(g.photos.length) + "</div></a>").join("") : empty("empty_gallery")) + "</div></div></section>";
+      '<h2 class="sr-only">' + E(T("gallery_title")) + "</h2>" + '<div class="grid grid--3">' + (list.length ? list.map(g => '<a class="card album-card" href="gallery.html?album=' + g.id + '"><img loading="lazy" src="' + (g.cover || (g.photos[0] && g.photos[0].src) || U.img(g.id, 400, 280)) + '" alt=""><div class="card-body"><h3>' + E(U.L(g, "title")) + '</h3><p class="muted">' + U.fmtDate(g.date) + " · " + U.num(g.photos.length) + " " + E(T("photos")) + '</p></div><div class="album-count">▦ ' + U.num(g.photos.length) + "</div></a>").join("") : empty("empty_gallery")) + "</div></div></section>";
     bindFilters(["f-year", "f-event"], ["year", "event"], "gallery.html");
   };
 
