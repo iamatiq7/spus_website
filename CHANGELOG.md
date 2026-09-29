@@ -12,10 +12,12 @@ All notable changes to the site. Dates in Asia/Dhaka. Live: https://iamatiq7.git
 - **Fix (Medium, a11y):** heading order (footer headings, hidden section headings on events/players/
   gallery) and invalid `role="tablist"` on archive/tournament link menus.
 - **Fix (Low, a11y):** admin page landmarks (`<main>` + `<h1>`) — axe-clean login & dashboard.
+- **Fix (Low):** detail pages (article/player/tournament/event) now set unique `document.title`; article page
+  also updates its meta description.
 - **Docs:** `live-verification-2026-09-29.md` full live test report; this changelog; handover/readme
   updates (placeholder + rollback).
-- Commits: `8d0f64e`, `5f98926`, `b73fdce` (merges `a5c4f48`, `5919290`, `a136a7d`).
-- Tags: `pre-fix-2026-09-29`, `pre-fix-a11y-2026-09-29`.
+- Commits: `8d0f64e`, `5f98926`, `b73fdce`, `9de9b41` (merges `a5c4f48`, `5919290`, `a136a7d`, `3681f5e`).
+- Tags: `pre-fix-2026-09-29`, `pre-fix-a11y-2026-09-29`, `pre-fix-titles-2026-09-29`.
 
 ## 2026-09-14 — Deployment verified
 - Final push completed (remote `main` = `1551b64`); GitHub Pages verified live: sitemap/canonical/OG on

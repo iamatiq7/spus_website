@@ -47,6 +47,7 @@ screenshot review. All evidence files are kept in the delivery workspace
 | 4 | Medium | axe **moderate** heading-order issues on events / gallery / players / search / 404 (h1 → h3 jumps). | Footer column headings `<h3>`→`<h2>`; added visually-hidden `<h2>` before the events/players/gallery card grids. | `5f98926` |
 | 5 | Medium | axe **critical** `aria-required-children` on archive year tabs and tournament tabs (`role="tablist"` on plain link menus). | Removed the invalid roles (these are navigation links, not ARIA tabs). | `5f98926` |
 | 6 | Low | Admin page: no `<main>` landmark, no `<h1>`, content outside landmarks (axe moderate). | Login screen + dashboard now use `<main>` landmarks and a visually-hidden/visible `<h1>`. | `b73fdce` (merge `a136a7d`) |
+| 7 | Low | Detail pages (article / player / tournament / event) shared their section's static `document.title` — duplicate titles when bookmarked or shared. | Detail renderers now set `document.title` to "<item> — <site name>"; the article page also updates its meta description to the excerpt. | `9de9b41` (merge `3681f5e`) |
 
 Nothing else was found: zero dead links, zero broken images, zero console errors, zero overflow at any
 tested width, and every form/admin flow works on the live site.
@@ -65,6 +66,12 @@ tested width, and every form/admin flow works on the live site.
   this session verified the live site loads the published layer and the placeholder file is served.
 - **Responsive:** 360/768/1024/1440 — no horizontal scroll on any tested page, burger menu appears at
   mobile widths and hides at 1440.
+- **Keyboard navigation:** Tab order starts with the skip link ("মূল কন্টেন্টে যান"), then the brand and
+  every nav item — logical order, focus visible (verified live).
+- **Independent spot-check** (separate read-only reviewer session): 13/13 key URLs and all 15 sitemap URLs
+  return 200; the custom 404 responds; `content.json` parses as a valid bundle — verdict: all pass.
+- **Per-page metadata:** unique titles and descriptions on all page types including detail pages (fixed in
+  the last round); Open Graph share image present.
 - **Cross-browser:** Chrome, Edge (full suites) and Firefox (main flows) — see summary table.
 - **Bengali typography:** correct rendering and correct `lang="bn"`; English switcher flips `lang` to `en`.
 
@@ -74,9 +81,10 @@ Every change set has a pre-change tag (nothing was deleted or force-pushed):
 
 | To undo | Command |
 |---|---|
-| The whole 2026-09-29 session | `git revert -m 1 a136a7d` then push (or revert each merge: `a5c4f48`, `5919290`, `a136a7d`) |
+| The whole 2026-09-29 session | `git revert -m 1 a136a7d` then push (or revert each merge: `a5c4f48`, `5919290`, `a136a7d`, `3681f5e`) |
 | The a11y round only | `git revert -m 1 5919290` + `git revert -m 1 a136a7d` |
 | The boot-delay fix only | `git revert -m 1 a5c4f48` |
+| The detail-title change only | `git revert -m 1 3681f5e` |
 | Back to the state before everything | `git checkout pre-fix-2026-09-29` (tag `14bd6e4`) |
 
 After any revert, GitHub Pages rebuilds automatically in ~1 minute. Working branches are preserved
