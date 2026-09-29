@@ -114,12 +114,12 @@
     document.getElementById("site-footer").innerHTML =
       '<div class="container footer-grid">' +
       '<div class="footer-brand"><img src="assets/img/logo.svg" alt="" width="52" height="52"><p><strong>' + UI.esc(lang === "en" ? site.name_en : site.name_bn) + "</strong></p><p class='muted'>" + UI.esc(UI.t("footer_about")) + "</p></div>" +
-      '<div><h3>' + UI.esc(UI.t("quick_links")) + '</h3><ul class="footer-links">' + quick.map(([h, k]) => '<li><a href="' + h + '">' + UI.esc(UI.t(k)) + "</a></li>").join("") + "</ul></div>" +
-      '<div><h3>' + UI.esc(UI.t("contact_info")) + '</h3><ul class="footer-contact">' +
+      '<div><h2>' + UI.esc(UI.t("quick_links")) + '</h3><ul class="footer-links">' + quick.map(([h, k]) => '<li><a href="' + h + '">' + UI.esc(UI.t(k)) + "</a></li>").join("") + "</ul></div>" +
+      '<div><h2>' + UI.esc(UI.t("contact_info")) + '</h3><ul class="footer-contact">' +
       "<li>📍 " + UI.esc(addr) + " " + (UI.isPlaceholder(addr) ? UI.phChip : "") + "</li>" +
       "<li>📞 " + UI.esc(c.phone) + " " + (UI.isPlaceholder(c.phone) ? UI.phChip : "") + "</li>" +
       "<li>✉️ " + UI.esc(c.email) + " " + (UI.isPlaceholder(c.email) ? UI.phChip : "") + "</li></ul>" +
-      "<h3>" + UI.esc(UI.t("follow_us")) + '</h3><p class="footer-social">' + (social.length ? social.join(" · ") : '<span class="muted">[Facebook · Instagram · YouTube]</span> ' + UI.phChip) + "</p></div></div>" +
+      "<h2>" + UI.esc(UI.t("follow_us")) + '</h3><p class="footer-social">' + (social.length ? social.join(" · ") : '<span class="muted">[Facebook · Instagram · YouTube]</span> ' + UI.phChip) + "</p></div></div>" +
       '<div class="footer-bottom"><div class="container footer-bottom-inner"><p>© ' + UI.num(new Date().getFullYear()) + " " + UI.esc(UI.t("rights")) + '</p><p><a href="privacy.html">' + UI.esc(UI.t("privacy")) + '</a> · <a href="terms.html">' + UI.esc(UI.t("terms")) + '</a> · <a href="admin.html" rel="nofollow">' + UI.esc(UI.t("nav_admin")) + "</a></p></div>" +
       '<div class="container footer-demo muted">' + UI.esc(UI.t("demo_note")) + "</div></div>";
   };
