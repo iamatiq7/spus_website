@@ -3,6 +3,9 @@
 A complete, mobile-first community portal for **Shantinagar Polli Unnayan Somiti** (শান্তিনগর পল্লী উন্নয়ন সমিতি).
 Primary language **Bangla (বাংলা)** with an **English** switcher (বাংলা | English, Bangla default).
 
+**Live site:** https://iamatiq7.github.io/spus_website/ (GitHub Pages — rebuilds automatically after every push to `main`).
+**Status (2026-09-29):** live-verified end-to-end — every page, link, form and admin flow tested on the deployed site; axe-core 0 violations; Lighthouse mobile 97 / 100 / 100 / 100. See [live-verification-2026-09-29.md](live-verification-2026-09-29.md) and [CHANGELOG.md](CHANGELOG.md).
+
 > ⚠️ Demo content: all team/player/member names, statistics, news and history entries are **demo data** and clearly
 > marked on the site (`ডেমো তথ্য` chips). Real organization info (phone, email, address, bKash/Nagad/Rocket numbers,
 > bank details) is intentionally left as `[ADD ...]` placeholders — see [PLACEHOLDERS.md](PLACEHOLDERS.md).
@@ -47,10 +50,10 @@ that made them (localStorage). To publish edits for **all visitors, permanently*
 
 1. Log in at `/admin.html`, add/edit/remove content.
 2. **Settings → ⬇ Download content.json (live update file)**.
-3. Place that `content.json` in this folder's root (replace the old one).
+3. Place that `content.json` in this folder's root (replace the included empty placeholder file).
 4. Commit + push (GitHub Desktop: Commit → Push origin). Live for everyone within ~1 minute.
 
-The site automatically loads `content.json` when present (delete the file to return to the seed data).
+The site automatically loads `content.json`. The repository ships with an **empty placeholder** bundle so nothing else is needed before the first publish; to return to the seed content, restore that empty placeholder (or simply delete the file).
 
 ## Optional Node backend (real persistent submissions)
 
@@ -84,14 +87,17 @@ node server/server.js
 ├── sitemap.xml, robots.txt
 ├── PLACEHOLDERS.md            # what to replace with real information
 ├── HANDOVER.md                # how to maintain: edit, deploy, submissions
-└── VERIFICATION.md            # test report (responsive/browser/perf/a11y/forms)
+├── VERIFICATION.md            # test report (responsive/browser/perf/a11y/forms)
+├── live-verification-2026-09-29.md   # live-site verification (this round)
+├── CHANGELOG.md               # history of changes
+└── content.json               # published-content file (empty placeholder by default)
 ```
 
 ## Tech notes & known limitations
 
 - Pure HTML/CSS/JS — **no build step, no framework, no external JS libraries** (fast, auditable).
-- Bangla font: Hind Siliguri via Google Fonts (system Bengali fonts as fallback; works offline with degraded typography).
+- Bangla font: system Bengali font stack (Hind Siliguri → Noto Sans Bengali → Nirmala UI → system) — no webfont download, non-blocking.
 - Detail pages use query params (`article.html?item=slug`) — SEO-friendly rewrite rules can be added at the host
   (the included Node server already falls back unknown paths to `index.html`).
 - Online payments are **not** processed: manual payment + transaction verification by design (gateway-ready architecture).
-- `sitemap.xml`/`robots.txt` ship with a placeholder domain — update the domain after pointing real hosting (see HANDOVER.md).
+- `sitemap.xml`/`robots.txt` are already set to `https://iamatiq7.github.io/spus_website/`; update them if you move to a custom domain.

@@ -6,8 +6,9 @@ Everything a non-developer admin needs to run this website long-term.
 
 | What | Where |
 |---|---|
-| Live preview URL | the AutoClaw preview link for this project (shareable over HTTPS). After you click **Publish** in the app, the stable URL replaces the preview. |
-| All content | stored in the browser (admin edits) on top of the seed dataset `assets/js/data.js` |
+| Live site (public) | **https://iamatiq7.github.io/spus_website/** — GitHub Pages; rebuilds automatically ~1 minute after any push to `main` |
+| Admin dashboard | footer → **অ্যাডমিন** or `/admin.html` |
+| All content | published content in `content.json` (repo) + browser-local admin edits on top of the seed dataset `assets/js/data.js` |
 | Contact form submissions | Admin → **যোগাযোগ বার্তা** (every message, timestamped) |
 | Donation submissions | Admin → **দান** (with যাচাই / verify button) |
 | Payment numbers | Admin → **দান → পেমেন্ট মাধ্যমের তথ্য** |
@@ -36,10 +37,10 @@ Admin edits are browser-local on static hosting. To publish them for **all visit
 
 1. Make your edits in the admin panel.
 2. **Settings → ⬇ Download content.json (live update file)**.
-3. Put the downloaded `content.json` in this folder's root (replace the old one).
+3. Put the downloaded `content.json` in this folder's root (replace the included empty placeholder file).
 4. Commit + push (GitHub Desktop). Live for everyone within ~1 minute.
 
-Delete `content.json` from the repo to return to the seed data. A full backup (submissions included) and JSON import are also available in the same panel.
+The repository ships with an **empty `content.json` placeholder** (it keeps the site error-free before the first publish). To return to the seed content, restore that empty placeholder — or delete the file. A full backup (submissions included) and JSON import are also available in the same panel.
 
 ## 4. Where submissions live & how to export
 
@@ -55,7 +56,9 @@ run the Node backend** so every submission from every visitor lands in one serve
 
 ## 5. Deploying updates
 
-- **AutoClaw preview:** ask the assistant to update the site; it redeploys automatically.
+- **GitHub Pages (current live site):** edit files → commit → push to `main`. The site rebuilds automatically in ~1 minute; no other action needed.
+- **Rollback (one step, non-destructive):** every change set is tagged (`pre-fix-2026-09-29`, `pre-fix-a11y-2026-09-29`, `backup-before-live-update`). To undo a change: `git revert -m 1 <merge-commit>` and push. Full details: [live-verification-2026-09-29.md](live-verification-2026-09-29.md) §5.
+- **AutoClaw preview (optional):** ask the assistant to refresh it.
 - **Own hosting (recommended for production):**
   1. Copy this folder to the host (any static host, or Node host for the backend).
   2. Static-only: any static server (nginx/Apache/Netlify) serving these files works.
@@ -80,6 +83,7 @@ log in as admin, edit each section, and delete demo records you replace. A full 
 
 ## 8. Known limitations
 
-- Static-preview admin edits live in that browser only until exported/imported elsewhere (JSON backup in Settings).
+- On the static site, admin edits live in that browser only until exported/published via `content.json` (or JSON backup in Settings).
+- Contact details and social links intentionally show placeholder chips ("প্রয়োজনীয় তথ্য দিন") until real values are entered — see [PLACEHOLDERS.md](PLACEHOLDERS.md).
 - Online payment gateways (bKash API etc.) are intentionally not integrated; the donation flow is manual-verify by design.
 - Lighthouse scores depend on the hosting CDN; the site itself ships zero libraries and inlines nothing heavy.
