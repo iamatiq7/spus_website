@@ -38,17 +38,20 @@
     _loadContentFile() {
       this.contentLayer = null;
       try {
-        Promise.race([
+        const settled = Promise.race([
           fetch("content.json", { cache: "no-cache" }),
           new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 2500))
         ]).then(r => (r && r.ok ? r.json() : null)).then(c => {
           if (c && c.kind === "spus-content") { this.contentLayer = c; window.dispatchEvent(new Event("spus-content-loaded")); }
         }).catch(() => {});
-      } catch (e) { /* ignore */ }
+        this._contentSettled = settled; /* boot waits only until this probe settles, not a fixed 4s */
+        return settled;
+      } catch (e) { this._contentSettled = Promise.resolve(); /* ignore */ }
     },
     ready() {
       if (!this._readyP) this._readyP = Promise.race([
         new Promise(res => window.addEventListener("spus-content-loaded", res, { once: true })),
+        this._contentSettled || new Promise(() => {}),
         new Promise(res => setTimeout(res, 4000))
       ]);
       return this._readyP;
@@ -196,9 +199,14 @@
     init() {
       this.contentLayer = null;
       this._loadContentFile();
-      try {
-        fetch("/api/ping").then(r => r.json()).then(d => { if (d && d.ok) this.serverMode = true; }).catch(() => {});
-      } catch (e) { /* ignore */ }
+      /* Probe for the optional Node backend. Skipped on static GitHub Pages hosting
+         (a server can never be present there), which also keeps the browser console free
+         of a 404 log on every page load. */
+      if (!/(^|\.)github\.io$/i.test(location.hostname)) {
+        try {
+          fetch("/api/ping").then(r => r.json()).then(d => { if (d && d.ok) this.serverMode = true; }).catch(() => {});
+        } catch (e) { /* ignore */ }
+      }
     }
   };
   window.SPUS_STORE = Store;

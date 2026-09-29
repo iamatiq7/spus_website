@@ -1,0 +1,8 @@
+{
+  "kind": "spus-content",
+  "version": 2,
+  "at": "2026-09-29T00:00:00.000Z",
+  "entities": {},
+  "settings": {},
+  "_comment": "Placeholder file. An empty bundle means the site shows its built-in seed content. To publish content for all visitors: in the Admin dashboard go to Settings and click 'Download content.json (live update file)', then replace this file with the downloaded one and commit/push it to the repository. To revert to the seed content, restore this empty placeholder (or simply delete this file)."
+}
