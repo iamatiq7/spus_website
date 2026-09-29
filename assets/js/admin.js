@@ -33,13 +33,13 @@
 
   /* ---------------- login ---------------- */
   function showLogin() {
-    root().innerHTML = '<div class="login-wrap"><div class="login-card">' +
+    root().innerHTML = '<main class="login-wrap"><div class="login-card">' + '<h1 class="sr-only">' + E(T("a_login_title")) + "</h1>" +
       '<div class="brand-line"><img src="assets/img/logo.svg" alt=""><div><strong>' + E(S.site().name_bn) + "</strong><div class='muted small'>" + E(T("a_login_title")) + "</div></div></div>" +
       '<form id="login-form" class="admin-form"><div class="fld"><label for="u">' + E(T("a_username")) + '</label><input id="u" autocomplete="username" required></div>' +
       '<div class="fld"><label for="p">' + E(T("a_password")) + '</label><input id="p" type="password" autocomplete="current-password" required></div>' +
       '<button class="btn btn--primary" type="submit">' + E(T("a_login_btn")) + "</button>" +
       '<p class="form-status" id="login-status"></p></form>' +
-      '<p class="login-note">🔐 ' + E(T("a_demo_note")) + "</p></div></div>";
+      '<p class="login-note">🔐 ' + E(T("a_demo_note")) + "</p></div></main>";
     document.getElementById("login-form").addEventListener("submit", async e => {
       e.preventDefault();
       const ok = await S.login(document.getElementById("u").value.trim(), document.getElementById("p").value);
@@ -63,11 +63,11 @@
     root().innerHTML = '<div class="admin-shell">' +
       '<aside class="admin-side"><div class="side-brand"><img src="assets/img/logo.svg" alt=""><strong>' + E(S.site().name_bn) + "<span class='muted small' style='color:#8FA79A'> " + E(T("a_role") + ": " + T("a_role_" + cur.role)) + "</span></strong></div>" +
       "<nav>" + items.map(([k, kk, ic]) => '<button type="button" data-sec="' + k + '"' + (k === currentSection ? ' class="is-active"' : "") + ">" + ic + " " + E(T(kk)) + "</button>").join("") + "</nav></aside>" +
-      '<div class="admin-main"><div class="admin-topbar"><h1 id="sec-title"></h1><div class="actions">' +
+      '<main class="admin-main"><div class="admin-topbar"><h1 id="sec-title"></h1><div class="actions">' +
       '<span class="mode-badge' + (S.serverMode ? " server" : "") + '">' + E(S.serverMode ? T("a_server_mode") : T("a_local_mode")) + "</span>" +
       '<a class="btn btn--ghost btn--sm" href="index.html">🌐 ' + E(T("nav_home")) + '</a>' +
       '<button class="btn btn--outline btn--sm" id="logout">' + E(T("a_logout")) + "</button></div></div>" +
-      '<div id="sec-body"></div></div></div>';
+      '<div id="sec-body"></div></main></div>';
     root().querySelectorAll("[data-sec]").forEach(b => b.addEventListener("click", () => { currentSection = b.dataset.sec; render(); }));
     document.getElementById("logout").addEventListener("click", () => { S.logout(); render(); });
     const fn = SECTIONS_MAP[currentSection] || dashSection;
