@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: spus-website
+    env: node
+    plan: free
+    startCommand: node server/server.js
+    healthCheckPath: /api/ping

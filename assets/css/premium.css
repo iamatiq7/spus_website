@@ -1,0 +1,78 @@
+/* ============================================================
+   SPUS — Premium Sports Club theme (Preset 11 Build × dark)
+   AcredClub-inspired: dark charcoal, emerald accent, gold highlight
+   ============================================================ */
+:root {
+  --bg: #0A0E13;
+  --surface: #11161D;
+  --surface-2: #151C24;
+  --ink: #EAF0F4;
+  --muted: #8B96A0;
+  --line: #1D2733;
+  --accent: #10B981;
+  --accent-deep: #059669;
+  --accent-soft: #0D2B22;
+  --accent-2: #F59E0B;
+  --accent-2-soft: #2B1F0D;
+  --danger: #F87171;
+  --danger-soft: #2B1210;
+  --info-soft: #0D1B2A;
+  --radius: 16px;
+  --radius-sm: 12px;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px rgba(0,0,0,.35);
+  --shadow-lift: 0 2px 4px rgba(0,0,0,.4), 0 18px 44px rgba(0,0,0,.45);
+  --container: 1180px;
+  --font: "Hind Siliguri", "Noto Sans Bengali", "Nirmala UI", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+body {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(16,185,129,.08), transparent 60%),
+    radial-gradient(900px 500px at 0% 20%, rgba(245,158,11,.05), transparent 55%),
+    var(--bg);
+  color: var(--ink);
+}
+a { color: var(--accent); }
+a:hover { color: #34D399; }
+.card, .panel { background: var(--surface); border-color: var(--line); box-shadow: var(--shadow); }
+.card:hover { box-shadow: var(--shadow-lift); }
+input, select, textarea {
+  background: #0D131A;
+  border-color: var(--line);
+  color: var(--ink);
+}
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+.btn--primary { background: var(--accent); color: #04110B; font-weight: 700; }
+.btn--primary:hover { background: #34D399; }
+.btn--outline { border-color: var(--accent); color: var(--accent); }
+.btn--outline:hover { background: var(--accent-soft); }
+.chip { background: var(--accent-soft); color: #6EE7B7; }
+.chip--demo, .chip--ph { background: var(--accent-2-soft); color: #FCD34D; }
+.notice-bar, .header-search input { background: var(--surface); }
+.site-header, .header-inner { background: rgba(10,14,19,.92) !important; backdrop-filter: blur(12px); }
+.nav-link.is-active { color: var(--accent); }
+.footer-grid, .footer-bottom { background: var(--surface); border-top: 1px solid var(--line); }
+.page-hero { background: linear-gradient(180deg, rgba(16,185,129,.08), transparent); }
+.hero { background: linear-gradient(135deg, rgba(16,185,129,.12), rgba(10,14,19,0) 60%); }
+.stat .n, .stat-num { color: var(--accent); }
+.empty-state { background: var(--surface); border: 1px dashed var(--line); color: var(--muted); }
+.table { background: var(--surface); }
+table th { background: var(--surface-2); color: var(--ink); }
+table td { border-color: var(--line); }
+.form-field input, .form-field select, .form-field textarea { background: #0D131A; }
+.login-wrap, .login-card { background: var(--surface); }
+.pos-badge { background: var(--accent); color: #04110B; }
+.cap-badge { background: var(--accent-2); color: #04110B; }
+.rank-pill { background: var(--accent-soft); color: #6EE7B7; }
+.info-item { background: var(--accent-soft); }
+.info-item span { color: var(--muted); }
+.info-item strong { color: var(--ink); }
+.player-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: .7rem; }
+.hero-kicker { color: var(--accent); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: .85rem; }
+section.section { padding: 2.6rem 0; }
+.section--tint { background: rgba(17,22,29,.6); }
+.donate-cta, .stats-band { background: linear-gradient(135deg, rgba(16,185,129,.1), transparent); }
+.method-card, .album-card, .fixture-card, .result-card, .news-card, .event-card, .player-card, .member-card { background: var(--surface); }
+.team-badge { filter: brightness(1.1); }
+.toast { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+.toast.is-visible { box-shadow: var(--shadow-lift); }
+.skip { background: var(--accent); color: #04110B; }

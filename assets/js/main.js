@@ -22,7 +22,7 @@
   function currentTournament() { return S.list("tournaments").find(t => t.status === "ongoing") || S.list("tournaments").filter(t => t.status !== "completed").sort(byDateDesc)[0]; }
   function shareLinks(url, title) {
     const enc = encodeURIComponent(url), encT = encodeURIComponent(title);
-    return '<div class="share-row"><span>' + E(T("follow_us")) + ":</span>" +
+    return '<div class="share-row"><span>' + E(T("share")) + ":</span>" +
       '<a target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=' + enc + '">Facebook</a>' +
       '<a target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=' + enc + "&text=" + encT + '">X</a>' +
       '<a target="_blank" rel="noopener" href="https://wa.me/?text=' + encT + "%20" + enc + '">WhatsApp</a>' +
@@ -42,9 +42,9 @@
     const results = S.list("results").sort(byDateDesc).slice(0, 2);
     const featured = players.slice(0, 4);
     const committee = S.list("committee").sort((a, b) => b.year - a.year)[0];
-    const cMembers = committee ? committee.members.filter(m => ["president", "gs", "treasurer", "sports_sec"].includes(m.position_key)).slice(0, 4) : [];
+    const cMembers = committee ? (committee.members || []).filter(m => ["president", "gs", "treasurer", "sports_sec"].includes(m.position_key)).slice(0, 4) : [];
     const gallery = S.list("gallery").sort(byDateDesc)[0];
-    const photos = gallery ? gallery.photos.slice(0, 8).map(p => Object.assign({ album: gallery.id }, p)) : [];
+    const photos = gallery ? (gallery.photos || []).slice(0, 8).map(p => Object.assign({ album: gallery.id }, p)) : [];
 
     let html = "";
     /* notices */
@@ -59,7 +59,8 @@
       '<h1>' + E(T("hero_title")) + "</h1>" +
       '<p class="hero-sub">' + E(T("hero_sub")) + "</p>" +
       '<div class="hero-actions"><a class="btn btn--outline" href="about.html">' + E(T("hero_btn_about")) + '</a><a class="btn btn--primary" href="donate.html">' + E(T("hero_btn_donate")) + "</a></div>" +
-      "</div></section>";
+      "</div></section>" +
+      (S.list("players").length ? "" : '<section class="section"><div class="container"><div class="card pad" style="text-align:center"><h2>' + E(T("r_cta")) + '</h2><p class="muted">' + E(T("r_sub")) + '</p><div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap"><a class="btn btn--primary btn--lg" href="register.html">' + E(T("r_submit")) + ' →</a><a class="btn btn--outline btn--lg" href="player-login.html">' + E(T("p_login")) + ' →</a></div></div></div></section>');
 
     /* news */
     html += '<section class="section">' + sectionHead(T("sec_news"), "news.html", "view_all_news") +
@@ -122,7 +123,8 @@
     main.innerHTML = html;
     main.querySelectorAll("[data-lb]").forEach(btn => btn.addEventListener("click", () => {
       const alb = S.list("gallery").find(g => g.id === btn.dataset.lb);
-      U.lightbox(alb.photos.map(p => Object.assign({ album: alb.id }, p)), parseInt(btn.dataset.idx, 10));
+      if (!alb) return;
+      U.lightbox((alb.photos || []).map(p => Object.assign({ album: alb.id }, p)), parseInt(btn.dataset.idx, 10));
     }));
   };
 
@@ -190,9 +192,6 @@
       '<div class="article-body">' + H(U.L(n, "body")) + "</div>" +
       shareLinks(url, U.L(n, "title")) + "</article>" +
       (related.length ? '<section class="section"><div class="container">' + sectionHead(T("article_related"), null) + '<div class="grid grid--3">' + related.map(U.newsCard).join("") + "</div></div></section>" : "");
-    document.title = U.L(n, "title") + " — " + S.site().name_bn;
-    const md = document.querySelector('meta[name="description"]');
-    if (md) md.setAttribute("content", U.L(n, "excerpt").slice(0, 160));
     document.getElementById("copy-link").addEventListener("click", () => { navigator.clipboard.writeText(url).then(() => U.toast("✓ " + T("copied"))); });
   };
 
@@ -212,7 +211,6 @@
         "<li><span>📍 " + E(T("event_location")) + "</span><strong>" + E(U.L(ev, "location")) + "</strong></li>" +
         "<li><span>🧑‍🤝‍🧑 " + E(T("organizer")) + "</span><strong>" + E(U.L(ev, "organizer")) + "</strong></li></ul>" +
         '<div class="article-body"><p>' + H(U.L(ev, "desc")) + "</p></div></article>";
-      document.title = U.L(ev, "title") + " — " + S.site().name_bn;
       return;
     }
     if (yr) list = list.filter(e => String(e.year) === yr);
@@ -223,7 +221,7 @@
       '<section class="section"><div class="container">' +
       '<div class="filter-bar">' + sel("f-year", years.map(y => ({ v: y, l: U.num(y) })), yr, T("all_years")) +
       sel("f-status", statuses.map(s => ({ v: s, l: T("st_" + s) })), st, T("all_statuses")) + "</div>" +
-      '<h2 class="sr-only">' + E(T("events_title")) + "</h2>" + '<div class="grid grid--3">' + (list.length ? list.map(U.eventCard).join("") : empty("empty_events")) + "</div></div></section>";
+      '<div class="grid grid--3">' + (list.length ? list.map(U.eventCard).join("") : empty("empty_events")) + "</div></div></section>";
     bindFilters(["f-year", "f-status"], ["year", "status"], "events.html");
   };
 
@@ -248,7 +246,7 @@
     }
     main.innerHTML = '<section class="page-hero"><div class="container"><h1>' + E(T("archive_title")) + '</h1><p class="muted">' + E(T("archive_sub")) + '</p></div></section>' +
       '<section class="section"><div class="container">' +
-      '<div class="year-tabs">' + years.map(yy => '<a class="year-tab' + (String(yy) === y ? " is-active" : "") + '" href="archive.html?y=' + yy + '">' + U.num(yy) + "</a>").join("") + "</div>" +
+      '<div class="year-tabs" role="tablist">' + years.map(yy => '<a class="year-tab' + (String(yy) === y ? " is-active" : "") + '" href="archive.html?y=' + yy + '">' + U.num(yy) + "</a>").join("") + "</div>" +
       '<div class="archive-grid">' +
       mini(T("tab_news"), "news", '<div class="stack">' + aNews.map(n => '<a class="row-link" href="article.html?item=' + E(n.slug || n.id) + '">' + E(U.L(n, "title")) + '<time>' + U.fmtDate(n.date) + "</time></a>").join("") + "</div>", "news.html?year=" + y, "empty_news", aNews.length) +
       mini(T("tab_events"), "events", '<div class="stack">' + aEvents.map(e => '<a class="row-link" href="events.html?item=' + e.id + '">' + E(U.L(e, "title")) + "<time>" + U.fmtDate(e.date) + "</time></a>").join("") + "</div>", "events.html?year=" + y, "empty_events", aEvents.length) +
@@ -256,9 +254,9 @@
       mini(T("tab_fixtures"), "fixtures", '<div class="stack">' + aFix.map(f => fixtureRow(f, teams)).join("") + "</div>", "fixtures.html?year=" + y, "empty_fixtures", aFix.length) +
       mini(T("tab_results"), "results", '<div class="stack">' + aRes.map(r => resultRow(r, teams)).join("") + "</div>", "results.html?year=" + y, "empty_results", aRes.length) +
       mini(T("tab_players"), "players", '<div class="grid grid--4">' + aPlayers.map(U.playerCard).join("") + "</div>", "players.html", "empty_players", aPlayers.length) +
-      mini(T("tab_committee"), "committee", '<div class="grid grid--4">' + (aComm[0] ? aComm[0].members.map(U.memberCard).join("") : "") + "</div>", "committee.html?year=" + y, "empty_committee", aComm.length) +
-      mini(T("tab_gallery"), "gallery", '<div class="grid grid--4">' + aGal.map(g => '<a class="card album-card" href="gallery.html?album=' + g.id + '"><img loading="lazy" src="' + (g.cover || (g.photos[0] && g.photos[0].src) || U.img(g.cover_seed || g.id, 400, 280)) + '" alt=""><div class="card-body"><h3>' + E(U.L(g, "title")) + "</h3><p class='muted'>" + U.num(g.photos.length) + " " + E(T("photos")) + "</p></div></a>").join("") + "</div>", "gallery.html?year=" + y, "empty_gallery", aGal.length) +
-      mini(T("tab_reports"), "reports", '<div class="stack">' + aRep.map(r => '<div class="row-link is-static">📄 ' + E(U.L(r, "title")) + U.demoChip + "</div>").join("") + "</div>", null, "empty_results", aRep.length) +
+      mini(T("tab_committee"), "committee", '<div class="grid grid--4">' + (aComm[0] ? (aComm[0].members || []).map(U.memberCard).join("") : "") + "</div>", "committee.html?year=" + y, "empty_committee", aComm.length) +
+      mini(T("tab_gallery"), "gallery", '<div class="grid grid--4">' + aGal.map(g => '<a class="card album-card" href="gallery.html?album=' + g.id + '"><img loading="lazy" src="' + (g.cover || (g.photos[0] && g.photos[0].src) || U.img(g.cover_seed || g.id, 400, 280)) + '" alt=""><div class="card-body"><h3>' + E(U.L(g, "title")) + "</h3><p class='muted'>" + U.num((g.photos || []).length) + " " + E(T("photos")) + "</p></div></a>").join("") + "</div>", "gallery.html?year=" + y, "empty_gallery", aGal.length) +
+      mini(T("tab_reports"), "reports", '<div class="stack">' + aRep.map(r => '<div class="row-link is-static">📄 ' + E(U.L(r, "title")) + U.demoChip + "</div>").join("") + "</div>", null, "empty_reports", aRep.length) +
       "</div></div></section>";
   };
   function fixtureRow(f, teams) {
@@ -331,21 +329,20 @@
       body = tPlayers.length ? '<div class="grid grid--4">' + tPlayers.map(U.playerCard).join("") + "</div>" : empty("empty_players");
     } else if (tab === "stats") {
       if (t.stat_columns === "cricket") {
-        const top = tPlayers.slice().sort((a, b) => (b.stats.runs || 0) - (a.stats.runs || 0)).slice(0, 5);
-        body = '<div class="card pad"><h3>' + E(T("st_runs")) + '</h3><ol class="rank-list">' + top.map(p => "<li><strong>" + E(U.L(p, "name")) + "</strong> <span class='muted'>" + E(U.L(teamMap[p.team_id] || {}, "name")) + " · " + U.num(p.stats.runs) + " " + E(T("st_runs")) + "</span></li>").join("") + "</ol></div>";
+        const top = tPlayers.slice().sort((a, b) => ((b.stats || {}).runs || 0) - ((a.stats || {}).runs || 0)).slice(0, 5);
+        body = '<div class="card pad"><h3>' + E(T("st_runs")) + '</h3><ol class="rank-list">' + top.map(p => "<li><strong>" + E(U.L(p, "name")) + "</strong> <span class='muted'>" + E(U.L(teamMap[p.team_id] || {}, "name")) + " · " + U.num((p.stats || {}).runs) + " " + E(T("st_runs")) + "</span></li>").join("") + "</ol></div>";
       } else {
-        const top = tPlayers.slice().sort((a, b) => (b.stats.goals || 0) - (a.stats.goals || 0)).slice(0, 5);
-        body = '<div class="card pad"><h3>' + E(T("st_goals")) + '</h3><ol class="rank-list">' + top.map(p => "<li><strong>" + E(U.L(p, "name")) + "</strong> <span class='muted'>" + E(U.L(teamMap[p.team_id] || {}, "name")) + " · " + U.num(p.stats.goals) + " " + E(T("st_goals")) + "</span></li>").join("") + "</ol></div>";
+        const top = tPlayers.slice().sort((a, b) => ((b.stats || {}).goals || 0) - ((a.stats || {}).goals || 0)).slice(0, 5);
+        body = '<div class="card pad"><h3>' + E(T("st_goals")) + '</h3><ol class="rank-list">' + top.map(p => "<li><strong>" + E(U.L(p, "name")) + "</strong> <span class='muted'>" + E(U.L(teamMap[p.team_id] || {}, "name")) + " · " + U.num((p.stats || {}).goals) + " " + E(T("st_goals")) + "</span></li>").join("") + "</ol></div>";
       }
     } else if (tab === "gallery") {
-      body = albums.length ? '<div class="grid grid--3">' + albums.map(g => '<a class="card album-card" href="gallery.html?album=' + g.id + '"><img loading="lazy" src="' + (g.cover || (g.photos[0] && g.photos[0].src) || U.img(g.id, 400, 280)) + '" alt=""><div class="card-body"><h3>' + E(U.L(g, "title")) + "</h3><p class='muted'>" + U.num(g.photos.length) + " " + E(T("photos")) + "</p></div></a>").join("") + "</div>" : empty("empty_gallery");
+      body = albums.length ? '<div class="grid grid--3">' + albums.map(g => '<a class="card album-card" href="gallery.html?album=' + g.id + '"><img loading="lazy" src="' + (g.cover || (g.photos[0] && g.photos[0].src) || U.img(g.id, 400, 280)) + '" alt=""><div class="card-body"><h3>' + E(U.L(g, "title")) + "</h3><p class='muted'>" + U.num((g.photos || []).length) + " " + E(T("photos")) + "</p></div></a>").join("") + "</div>" : empty("empty_gallery");
     }
     const tabs = [["overview", "tab_overview"], ["fixtures", "tab_fixtures2"], ["results", "tab_results"], ["standings", "tab_standings"], ["players", "tab_players"], ["stats", "tab_stats2"], ["gallery", "tab_gallery"]];
     main.innerHTML = '<section class="page-hero"><div class="container"><div class="card-meta">' + U.statusChip(t.status) + " <span class='chip chip--cat'>" + E(sp.icon + " " + U.L(sp, "name")) + "</span></div><h1>" + E(U.L(t, "name")) + '</h1><p class="muted">' + U.fmtDate(t.start_date) + " – " + U.fmtDate(t.end_date) + " · " + E(U.L(t, "venue")) + "</p></div></section>" +
       '<section class="section"><div class="container">' +
-      '<div class="tabs">' + tabs.map(([k, kk]) => '<a class="tab' + (tab === k ? " is-active" : "") + '" href="tournament.html?t=' + E(t.slug) + "&tab=" + k + '">' + E(T(kk)) + "</a>").join("") + "</div>" +
+      '<div class="tabs" role="tablist">' + tabs.map(([k, kk]) => '<a class="tab' + (tab === k ? " is-active" : "") + '" href="tournament.html?t=' + E(t.slug) + "&tab=" + k + '">' + E(T(kk)) + "</a>").join("") + "</div>" +
       body + "</div></section>";
-    document.title = U.L(t, "name") + " — " + S.site().name_bn;
   };
   function standingsTable(st, teamMap, t) {
     const cricket = t.stat_columns === "cricket";
@@ -425,13 +422,13 @@
     if (tm) list = list.filter(p => p.team_id === tm);
     if (tr) list = list.filter(p => p.tournament_id === tr);
     if (ac) list = list.filter(p => String(p.active) === ac);
-    main.innerHTML = '<section class="page-hero"><div class="container"><h1>' + E(T("players_title")) + "</h1></div></section>" +
+    main.innerHTML = '<section class="page-hero"><div class="container"><div class="players-hero-row"><h1 style="margin:0">' + E(T("players_title")) + '</h1><a class="btn btn--primary btn--sm" href="register.html">' + E(T("r_cta")) + "</a></div></div></section>" +
       '<section class="section"><div class="container">' +
       '<div class="filter-bar">' + sel("f-sport", sports.map(s => ({ v: s.id, l: U.L(s, "name") })), sp, T("all_sports")) +
       sel("f-team", teams.map(t => ({ v: t.id, l: U.L(t, "name") })), tm, T("all_teams")) +
       sel("f-tour", tours.map(t => ({ v: t.id, l: U.L(t, "name") })), tr, T("all")) +
       sel("f-active", [{ v: "true", l: T("active") }, { v: "false", l: T("inactive") }], ac, T("all")) + "</div>" +
-      '<h2 class="sr-only">' + E(T("players_title")) + "</h2>" + '<div class="grid grid--4">' + (list.length ? list.map(U.playerCard).join("") : empty("empty_players")) + "</div></div></section>";
+      '<div class="grid grid--4">' + (list.length ? list.map(U.playerCard).join("") : empty("empty_players")) + "</div></div></section>";
     bindFilters(["f-sport", "f-team", "f-tour", "f-active"], ["sport", "team", "t", "active"], "players.html");
   };
 
@@ -444,22 +441,51 @@
     const sport = S.list("sports").find(s => s.id === p.sport_id) || {};
     const tours = S.list("tournaments").filter(t => t.id === p.tournament_id);
     const results = S.list("results").filter(r => r.tournament_id === p.tournament_id && (r.team_a_id === p.team_id || r.team_b_id === p.team_id)).sort(byDateDesc);
-    const isCricket = sport.score_format === "cricket";
+    const pstats = p.stats || {};
+    const isCricket = sport.score_format === "cricket" || String(p.sport || "").toLowerCase() === "cricket";
     const statDefs = isCricket
-      ? [["st_matches", p.stats.matches], ["st_runs", p.stats.runs], ["st_wickets", p.stats.wickets], ["st_average", p.stats.average], ["st_sr", p.stats.sr]]
-      : [["st_matches", p.stats.matches], ["st_goals", p.stats.goals], ["st_assists", p.stats.assists], ["st_yellow", p.stats.yellow], ["st_red", p.stats.red]];
+      ? [["st_matches", pstats.matches], ["st_runs", pstats.runs], ["st_wickets", pstats.wickets], ["st_average", pstats.average], ["st_sr", pstats.sr]]
+      : [["st_matches", pstats.matches], ["st_goals", pstats.goals], ["st_assists", pstats.assists], ["st_yellow", pstats.yellow], ["st_red", pstats.red]];
+    const posCode = String(p.position_code || "").toUpperCase();
+    const badges = [];
+    if (posCode || U.L(p, "position")) badges.push('<span class="pos-badge">' + E(posCode || U.L(p, "position")) + (posCode && U.L(p, "position") ? " · " + E(U.L(p, "position")) : "") + "</span>");
+    if (p.is_captain) badges.push('<span class="cap-badge">🎗 ' + E(T("captain")) + "</span>");
+    else if (p.is_vice_captain) badges.push('<span class="cap-badge">🎗 ' + E(T("vice_captain")) + "</span>");
+    if (p.ranking != null && p.ranking !== "") badges.push('<span class="rank-pill">#' + E(p.ranking) + " " + E(T("ranking")) + "</span>");
+    if (p.rating != null && p.rating !== "") badges.push('<span class="rank-pill">★ ' + E(p.rating) + "</span>");
+    badges.push('<span class="chip chip--' + (p.active ? "published" : "draft") + '">' + E(p.active ? T("active") : T("inactive")) + "</span>");
+    if (p.demo) badges.push(U.demoChip);
+    const footMap = { left: T("left"), right: T("right"), both: T("both_foot"), l: T("left"), r: T("right") };
+    const footTxt = footMap[String(p.foot || "").toLowerCase()] || p.foot;
+    let age = "";
+    if (p.dob) { const d = new Date(p.dob + "T00:00:00"); if (!isNaN(d)) age = Math.floor((Date.now() - d.getTime()) / 31557600000); }
+    const infos = [
+      [T("pos"), U.L(p, "position") || posCode],
+      [T("team"), U.L(team, "name")],
+      [T("sport"), (sport.icon ? sport.icon + " " : "") + U.L(sport, "name")],
+      [T("dob"), p.dob ? U.fmtDate(p.dob) + (age !== "" && !isNaN(age) ? " · " + U.num(age) + " " + T("yrs") : "") : ""],
+      [T("height"), p.height_cm != null && p.height_cm !== "" ? U.num(p.height_cm) + " " + T("cm") : ""],
+      [T("weight"), p.weight_kg != null && p.weight_kg !== "" ? U.num(p.weight_kg) + " " + T("kg") : ""],
+      [T("foot"), footTxt],
+      [T("birthplace"), p.birthplace],
+      [T("joined_year"), p.joined_year || p.joined],
+      [T("ranking"), p.ranking != null && p.ranking !== "" ? "#" + p.ranking : ""],
+      [T("rating"), p.rating != null && p.rating !== "" ? p.rating + " / 10" : ""],
+      [T("nickname"), p.nickname]
+    ].filter(function (x) { return x[1] != null && x[1] !== ""; });
     main.innerHTML = '<section class="page-hero player-hero"><div class="container player-hero-inner">' +
       '<img class="player-hero-photo" src="' + (p.image || U.avatar(U.L(p, "name"), p.id)) + '" alt="' + E(U.L(p, "name")) + '">' +
-      '<div><span class="jersey jersey--lg">#' + U.num(p.jersey) + "</span><h1>" + E(U.L(p, "name")) + "</h1>" +
-      '<p class="muted">' + E(U.L(p, "position")) + " · " + E(U.L(team, "name")) + " · " + E(sport.icon + " " + U.L(sport, "name")) + " · " + (p.active ? E(T("active")) : E(T("inactive"))) + (p.demo ? " " + U.demoChip : "") + "</p></div></div></section>" +
+      '<div><div class="player-badges">' + badges.join("") + "</div>" +
+      '<span class="jersey jersey--lg">#' + U.num(p.jersey) + "</span><h1>" + E(U.L(p, "name")) + (p.nickname ? ' <small class="muted">“' + E(p.nickname) + "”</small>" : "") + "</h1>" +
+      '<p class="muted">' + [U.L(p, "position"), U.L(team, "name"), sport.icon ? sport.icon + " " + U.L(sport, "name") : ""].filter(Boolean).map(E).join(" · ") + "</p></div></div></section>" +
       '<section class="section"><div class="container">' +
-      '<div class="stat-cards">' + statDefs.map(([k, v]) => '<div class="stat"><span class="stat-num">' + U.num(v) + "</span><span class='stat-label'>" + E(T(k)) + "</span></div>").join("") + "</div>" +
+      (infos.length ? '<h2 class="visually-hidden">' + E(T("personal")) + "</h2>" + '<div class="info-grid">' + infos.map(function (x) { return '<div class="info-item"><span>' + E(x[0]) + "</span><strong>" + E(x[1]) + "</strong></div>"; }).join("") + "</div>" : "") +
+      '<div class="stat-cards" style="margin-top:1.2rem">' + statDefs.map(([k, v]) => '<div class="stat"><span class="stat-num">' + U.num(v == null ? 0 : v) + "</span><span class='stat-label'>" + E(T(k)) + "</span></div>").join("") + "</div>" +
       '<div class="card pad" style="margin-top:2rem"><h2>' + E(T("bio")) + "</h2><p>" + E(U.L(p, "bio")) + "</p>" +
-      (p.achievements_bn && p.achievements_bn.length ? "<h2>" + E(T("achievements")) + '</h2><ul class="check-list">' + U.pick(p.achievements_bn, p.achievements_en).map(a => "<li>🏅 " + E(a) + "</li>").join("") + "</ul>" : "") + "</div>" +
+      (((p.achievements_bn && p.achievements_bn.length) || (p.achievements_en && p.achievements_en.length)) ? "<h2>" + E(T("achievements")) + '</h2><ul class="check-list">' + U.pick(p.achievements_bn, p.achievements_en).map(a => "<li>🏅 " + E(a) + "</li>").join("") + "</ul>" : "") + "</div>" +
       '<div class="card pad" style="margin-top:2rem"><h2>' + E(T("tab_tournaments")) + '</h2><div class="stack">' + (tours.length ? tours.map(t => '<a class="row-link" href="tournament.html?t=' + E(t.slug) + '">' + E(U.L(t, "name")) + U.statusChip(t.status) + "</a>").join("") : empty("empty_tournaments")) + "</div></div>" +
       '<div class="card pad" style="margin-top:2rem"><h2>' + E(T("tab_results")) + '</h2><div class="stack">' + (results.length ? results.map(r => resultRow(r, S.list("teams"))).join("") : empty("empty_results")) + "</div></div>" +
       '<a class="text-link" href="players.html">← ' + E(T("players_title")) + "</a></div></section>";
-    document.title = U.L(p, "name") + " — " + S.site().name_bn;
   };
 
   /* ================= COMMITTEE ================= */
@@ -469,7 +495,7 @@
     const yr = parseInt(U.qs("year") || (years[0] || "0"), 10);
     const comm = comms.find(c => c.year === yr) || comms[0];
     const order = ["president", "vp", "gs", "joint_gs", "treasurer", "sports_sec", "org_sec", "member"];
-    const members = comm ? comm.members.slice().sort((a, b) => order.indexOf(a.position_key) - order.indexOf(b.position_key)) : [];
+    const members = comm ? (comm.members || []).slice().sort((a, b) => order.indexOf(a.position_key) - order.indexOf(b.position_key)) : [];
     main.innerHTML = '<section class="page-hero"><div class="container"><h1>' + E(T("committee_title")) + '</h1><p class="muted">' + E(T("committee_sub")) + "</p></div></section>" +
       '<section class="section"><div class="container">' +
       '<div class="year-tabs">' + years.map(y => '<a class="year-tab' + (y === yr ? " is-active" : "") + '" href="committee.html?year=' + y + '">' + E(T("year")) + " " + U.num(y) + "</a>").join("") + "</div>" +
@@ -484,8 +510,8 @@
     if (ab) {
       const album = albums.find(g => g.id === ab);
       if (!album) { main.innerHTML = notFound(); return; }
-      const ph = album.photos.map(p => Object.assign({ album: album.id }, p));
-      main.innerHTML = '<section class="page-hero"><div class="container"><a class="text-link" href="gallery.html">← ' + E(T("gallery_title")) + "</a><h1>" + E(U.L(album, "title")) + '</h1><p class="muted">' + U.fmtDate(album.date) + " · " + U.num(album.photos.length) + " " + E(T("photos")) + '</p></div></section>' +
+      const ph = (album.photos || []).map(p => Object.assign({ album: album.id }, p));
+      main.innerHTML = '<section class="page-hero"><div class="container"><a class="text-link" href="gallery.html">← ' + E(T("gallery_title")) + "</a><h1>" + E(U.L(album, "title")) + '</h1><p class="muted">' + U.fmtDate(album.date) + " · " + U.num((album.photos || []).length) + " " + E(T("photos")) + '</p></div></section>' +
         '<section class="section"><div class="container"><div class="gallery-grid">' +
         ph.map((p, i) => '<button class="gallery-item" data-idx="' + i + '"><img loading="lazy" src="' + (p.src || U.img(p.id, 400, 300, "")) + '" alt="' + E(U.L(p, "caption")) + '"></button>').join("") + "</div></div></section>";
       main.querySelectorAll("[data-idx]").forEach(btn => btn.addEventListener("click", () => U.lightbox(ph, parseInt(btn.dataset.idx, 10))));
@@ -498,7 +524,7 @@
       '<section class="section"><div class="container">' +
       '<div class="filter-bar">' + sel("f-year", years.map(y => ({ v: y, l: U.num(y) })), yr, T("all_years")) +
       sel("f-event", [].concat(S.list("tournaments"), events).map(x => ({ v: x.id, l: U.L(x, "name") })), ev, T("all")) + "</div>" +
-      '<h2 class="sr-only">' + E(T("gallery_title")) + "</h2>" + '<div class="grid grid--3">' + (list.length ? list.map(g => '<a class="card album-card" href="gallery.html?album=' + g.id + '"><img loading="lazy" src="' + (g.cover || (g.photos[0] && g.photos[0].src) || U.img(g.id, 400, 280)) + '" alt=""><div class="card-body"><h3>' + E(U.L(g, "title")) + '</h3><p class="muted">' + U.fmtDate(g.date) + " · " + U.num(g.photos.length) + " " + E(T("photos")) + '</p></div><div class="album-count">▦ ' + U.num(g.photos.length) + "</div></a>").join("") : empty("empty_gallery")) + "</div></div></section>";
+      '<div class="grid grid--3">' + (list.length ? list.map(g => '<a class="card album-card" href="gallery.html?album=' + g.id + '"><img loading="lazy" src="' + (g.cover || (g.photos[0] && g.photos[0].src) || U.img(g.id, 400, 280)) + '" alt=""><div class="card-body"><h3>' + E(U.L(g, "title")) + '</h3><p class="muted">' + U.fmtDate(g.date) + " · " + U.num((g.photos || []).length) + " " + E(T("photos")) + '</p></div><div class="album-count">▦ ' + U.num((g.photos || []).length) + "</div></a>").join("") : empty("empty_gallery")) + "</div></div></section>";
     bindFilters(["f-year", "f-event"], ["year", "event"], "gallery.html");
   };
 
@@ -537,11 +563,11 @@
     document.getElementById("donation-form").addEventListener("submit", function (e) {
       e.preventDefault();
       const f = e.target, st = document.getElementById("df-status");
-      const val = id => f[id].value.trim();
+      const val = id => f.elements[id].value.trim();
       let ok = true;
       [["name", v => !!v, T("err_required")], ["phone", v => /^[+\d][\d\s-]{6,15}$/.test(v), T("err_phone")], ["email", v => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), T("err_email")], ["amount", v => parseFloat(v) > 0, T("err_required")], ["txn", v => !!v, T("err_required")]]
         .forEach(([id, fn, msg]) => {
-          const el = f[id]; const bad = !fn(val(id));
+          const el = f.elements[id]; const bad = !fn(val(id));
           el.classList.toggle("is-invalid", bad);
           if (bad) ok = false;
         });
@@ -549,7 +575,7 @@
       S.addSub("donation", {
         name: document.getElementById("anonymous").checked ? "(Anonymous)" : val("name"),
         phone: val("phone"), email: val("email"), amount: parseFloat(val("amount")),
-        method: f.method.value, txn: val("txn"), message: val("message"),
+        method: f.elements.method.value, txn: val("txn"), message: val("message"),
         anonymous: document.getElementById("anonymous").checked, status: "pending", lang: lang
       }).then(() => {
         st.textContent = "✓ " + T("donate_success"); st.className = "form-status is-success";
@@ -589,10 +615,10 @@
     document.getElementById("contact-form").addEventListener("submit", function (e) {
       e.preventDefault();
       const f = e.target, st = document.getElementById("cf-status");
-      const val = id => f[id].value.trim();
+      const val = id => f.elements[id].value.trim();
       let ok = true;
       [["name", v => !!v, T("err_required")], ["phone", v => /^[+\d][\d\s-]{6,15}$/.test(v), T("err_phone")], ["email", v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), T("err_email")], ["subject", v => !!v, T("err_required")], ["message", v => !!v, T("err_required")]]
-        .forEach(([id, fn, msg]) => { const bad = !fn(val(id)); f[id].classList.toggle("is-invalid", bad); if (bad) ok = false; });
+        .forEach(([id, fn, msg]) => { const bad = !fn(val(id)); f.elements[id].classList.toggle("is-invalid", bad); if (bad) ok = false; });
       if (!ok) { st.textContent = T("err_required"); st.className = "form-status is-error"; return; }
       S.addSub("contact", { name: val("name"), phone: val("phone"), email: val("email"), subject: val("subject"), message: val("message"), status: "new", lang: lang }).then(() => {
         st.textContent = "✓ " + T("contact_success"); st.className = "form-status is-success";
@@ -613,7 +639,7 @@
       const evs = S.list("events").filter(e => U.L(e, "title").toLowerCase().includes(k)).map(e => '<a class="row-link" href="events.html?item=' + e.id + '">📅 ' + E(U.L(e, "title")) + "<time>" + U.fmtDate(e.date) + "</time></a>");
       const pls = S.list("players").filter(p => U.L(p, "name").toLowerCase().includes(k)).map(p => '<a class="row-link" href="player.html?p=' + E(p.slug || p.id) + '">🏃 ' + E(U.L(p, "name")) + "</a>");
       const trs = S.list("tournaments").filter(t => U.L(t, "name").toLowerCase().includes(k)).map(t => '<a class="row-link" href="tournament.html?t=' + E(t.slug) + '">🏆 ' + E(U.L(t, "name")) + "</a>");
-      const cms = S.list("committee").flatMap(c => c.members.map(m => ({ m, c }))).filter(x => U.L(x.m, "name").toLowerCase().includes(k)).map(x => '<a class="row-link" href="committee.html?year=' + x.c.year + '">🧑‍💼 ' + E(U.L(x.m, "name")) + " — " + E(U.L(x.m, "position")) + " (" + U.num(x.c.year) + ")</a>");
+      const cms = S.list("committee").flatMap(c => (c.members || []).map(m => ({ m, c }))).filter(x => U.L(x.m, "name").toLowerCase().includes(k)).map(x => '<a class="row-link" href="committee.html?year=' + x.c.year + '">🧑‍💼 ' + E(U.L(x.m, "name")) + " — " + E(U.L(x.m, "position")) + " (" + U.num(x.c.year) + ")</a>");
       const gal = S.list("gallery").filter(g => U.L(g, "title").toLowerCase().includes(k)).map(g => '<a class="row-link" href="gallery.html?album=' + g.id + '">🖼️ ' + E(U.L(g, "title")) + "</a>");
       out = group(T("tab_news"), news) + group(T("tab_events"), evs) + group(T("tab_players"), pls) + group(T("tab_tournaments"), trs) + group(T("tab_committee"), cms) + group(T("tab_gallery"), gal);
       if (!out) out = empty("search_none");
@@ -621,9 +647,133 @@
     main.innerHTML = '<section class="page-hero"><div class="container"><h1>' + E(T("search_title")) + '</h1><p class="muted">' + E(T("search_for")) + " “" + E(q) + '”</p></div></section><section class="section"><div class="container">' + out + "</div></section>";
   };
 
+  /* ================= REGISTER ================= */
+  PAGES.register = function (main) {
+    const sports = S.list("sports");
+    const posList = ["ST", "CF", "LW", "RW", "CAM", "CM", "CDM", "LM", "RM", "CB", "LB", "RB", "LWB", "RWB", "GK", "BAT", "BOWL", "AR", "WK", "RAID", "DEF"];
+    function field(id, label, type, req) {
+      return '<div class="form-field"><label for="' + id + '">' + E(label) + (req ? ' <span class="req" aria-hidden="true">*</span>' : "") + '</label><input id="' + id + '" name="' + id + '" type="' + type + '"' + (req ? " required" : "") + "></div>";
+    }
+    main.innerHTML = '<section class="page-hero"><div class="container"><h1>' + E(T("r_title")) + '</h1><p class="muted">' + E(T("r_sub")) + "</p></div></section>" +
+      '<section class="section"><div class="container"><div class="card pad" style="max-width:820px;margin:0 auto">' +
+      '<div class="callout">' + (S.serverMode ? E(T("r_server_note")) : E(T("r_local_note"))) + "</div>" +
+      '<form id="reg-form" class="form" novalidate style="margin-top:1.4rem"><div class="form-grid">' +
+      field("name_bn", T("r_name_bn"), "text", true) +
+      field("name_en", T("r_name_en"), "text", true) +
+      field("nickname", T("r_nickname"), "text", false) +
+      field("jersey", T("r_jersey"), "number", false) +
+      '<div class="form-field"><label for="sport">' + E(T("r_sport")) + ' <span class="req" aria-hidden="true">*</span></label><select id="sport" name="sport" required><option value="">—</option>' + sports.map(s => '<option value="' + E(U.L(s, "name")) + '">' + E(s.icon + " " + U.L(s, "name")) + "</option>").join("") + '<option value="Other">' + E(T("r_other")) + "</option></select></div>" +
+      '<div class="form-field"><label for="position_code">' + E(T("r_pos_code")) + '</label><input id="position_code" name="position_code" list="pos-list" placeholder="ST / GK / CM…"><datalist id="pos-list">' + posList.map(c => "<option value='" + c + "'>").join("") + "</datalist></div>" +
+      field("position_bn", T("r_pos_bn"), "text", false) +
+      '<div class="form-field"><label for="foot">' + E(T("r_foot")) + '</label><select id="foot" name="foot"><option value="">—</option><option value="Left">' + E(T("left")) + '</option><option value="Right">' + E(T("right")) + '</option><option value="Both">' + E(T("both_foot")) + "</option></select></div>" +
+      field("dob", T("r_dob"), "date", false) +
+      field("height_cm", T("r_height"), "number", false) +
+      field("weight_kg", T("r_weight"), "number", false) +
+      field("birthplace", T("r_birth"), "text", false) +
+      field("phone", T("r_phone"), "tel", false) +
+      field("password", T("r_pass"), "password", true) +
+      field("password2", T("r_pass2"), "password", true) +
+      "</div>" +
+      '<div class="form-field" style="margin-top:1rem"><label for="bio_bn">' + E(T("r_bio")) + '</label><textarea id="bio_bn" name="bio_bn" rows="3"></textarea></div>' +
+      '<div class="form-field"><label for="achievements_bn">' + E(T("r_ach")) + '</label><textarea id="achievements_bn" name="achievements_bn" rows="2"></textarea></div>' +
+      '<div class="form-field"><label for="photo">' + E(T("r_photo")) + '</label><input type="file" id="photo" accept="image/*" style="max-width:320px"><p class="muted small">' + E(T("r_photo_hint")) + "</p>" +
+      '<div style="display:flex;gap:12px;align-items:center"><img id="photo-prev" alt="" style="width:72px;height:72px;border-radius:50%;object-fit:cover;display:none"><button type="button" class="btn btn--outline btn--sm" id="photo-clear" hidden>✕</button></div>' +
+      '<p class="muted small" style="margin-top:.6rem">' + E(T("r_photo_free")) + "</p></div>" +
+      '<input type="text" name="website" value="" style="position:absolute;left:-9999px" tabindex="-1" autocomplete="off" aria-hidden="true">' +
+      '<button class="btn btn--primary btn--lg" type="submit">' + E(T("r_submit")) + "</button>" +
+      '<p class="form-status" id="reg-status" role="status"></p></form></div></div></section>';
+    const f = document.getElementById("reg-form");
+    const photoInp = document.getElementById("photo");
+    const prev = document.getElementById("photo-prev");
+    const clearBtn = document.getElementById("photo-clear");
+    let photoData = "";
+    photoInp.addEventListener("change", () => {
+      const file = photoInp.files[0]; if (!file) return;
+      U.resizeImage(file, 500).then(function (d) { photoData = d; prev.src = d; prev.style.display = "block"; clearBtn.hidden = false; });
+    });
+    clearBtn.addEventListener("click", function () { photoData = ""; photoInp.value = ""; prev.style.display = "none"; clearBtn.hidden = true; });
+    f.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const st = document.getElementById("reg-status");
+      const val = function (id) { return f.elements[id].value.trim(); };
+      if (!val("name_bn") && !val("name_en")) { st.textContent = T("r_need"); st.className = "form-status is-error"; return; }
+      if (!val("sport")) { st.textContent = T("r_need"); st.className = "form-status is-error"; return; }
+      const rec = {
+        name_bn: val("name_bn"), name_en: val("name_en"), nickname: val("nickname"),
+        jersey: val("jersey"), sport: val("sport"), position_code: val("position_code").toUpperCase(),
+        position_bn: val("position_bn"), position_en: "", foot: val("foot"),
+        dob: val("dob"), height_cm: val("height_cm"), weight_kg: val("weight_kg"),
+        birthplace: val("birthplace"), phone: val("phone"),
+        bio_bn: val("bio_bn"), achievements_bn: val("achievements_bn"),
+        photo: photoData, website: val("website"), lang: S.lang()
+      };
+      if (val("password").length < 6 || val("password") !== val("password2")) {
+        st.textContent = T("r_pass"); st.className = "form-status is-error"; return;
+      }
+      rec.password = await S._sha(val("password"));
+      S.addReg(rec).then(function () {
+        st.textContent = "✓ " + T("r_success"); st.className = "form-status is-success";
+        U.toast("✓ " + T("r_success"));
+        f.reset(); photoData = ""; prev.style.display = "none"; clearBtn.hidden = true;
+      });
+    });
+  };
+
+  /* ================= PLAYER LOGIN / PORTAL ================= */
+  PAGES.playerLogin = function (main) {
+    if (S.playerCurrent && S.playerCurrent()) { location.href = "my-matches.html"; return; }
+    main.innerHTML = '<section class="page-hero"><div class="container"><h1>' + E(T("r_login_title")) + '</h1><p class="muted">' + E(T("r_login_sub")) + "</p></div></section>" +
+      '<section class="section"><div class="container"><div class="card pad" style="max-width:460px;margin:0 auto">' +
+      '<form id="plogin" class="form" novalidate>' +
+      '<div class="form-field"><label for="p-phone">' + E(T("r_login_phone")) + '</label><input id="p-phone" type="tel" required autocomplete="tel"></div>' +
+      '<div class="form-field"><label for="p-pass">' + E(T("a_password")) + '</label><input id="p-pass" type="password" required autocomplete="current-password"></div>' +
+      '<button class="btn btn--primary btn--lg" type="submit">' + E(T("r_login_btn")) + "</button>" +
+      '<p class="form-status" id="pl-status" role="status"></p></form>' +
+      '<p class="muted small" style="margin-top:1rem">' + E(T("r_login_sub")) + " " + E(T("r_cta")) + ': <a href="register.html">register.html</a></p>' +
+      "</div></div></section>";
+    document.getElementById("plogin").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const st = document.getElementById("pl-status");
+      const phone = document.getElementById("p-phone").value.trim();
+      const pass = document.getElementById("p-pass").value;
+      if (!phone || !pass) { st.textContent = T("r_need_pass"); st.className = "form-status is-error"; return; }
+      const ok = await S.playerLogin(phone, pass);
+      if (ok) { location.href = "my-matches.html"; }
+      else { st.textContent = T("r_login_err"); st.className = "form-status is-error"; }
+    });
+  };
+
+  PAGES.myMatches = function (main) {
+    const me = S.playerCurrent ? S.playerCurrent() : null;
+    if (!me) { location.href = "player-login.html"; return; }
+    const fixtures = S.list("fixtures");
+    const mine = fixtures.filter(f => (me.team_id && (f.team_a_id === me.team_id || f.team_b_id === me.team_id)) || true);
+    const today = new Date().toISOString().slice(0, 10);
+    const upcoming = mine.filter(f => (f.date || "") >= today && f.status !== "completed" && f.status !== "cancelled").sort((a, b) => (a.date + (a.time || "")).localeCompare(b.date + (b.time || "")));
+    const pastRes = S.list("results").filter(r => (me.team_id ? r.team_a_id === me.team_id || r.team_b_id === me.team_id : false)).sort(byDateDesc);
+    const teams = S.list("teams");
+    const team = teams.find(t => t.id === me.team_id) || {};
+    const sport = S.list("sports").find(s => s.id === me.sport_id) || {};
+    main.innerHTML = '<section class="page-hero player-hero"><div class="container player-hero-inner">' +
+      '<img class="player-hero-photo" src="' + (me.photo || U.avatar(U.L(me, "name") || me.name_en || me.name_bn || "?", me.id)) + '" alt="">' +
+      '<div><div class="player-badges"><span class="pos-badge">' + E(me.position_code || T("m_profile")) + "</span>" +
+      (me.jersey ? '<span class="jersey jersey--lg">#' + U.num(me.jersey) + "</span>" : "") + "</div>" +
+      "<h1>" + E(U.L(me, "name") || me.name_en || me.name_bn) + "</h1>" +
+      '<p class="muted">' + [U.L(me, "position"), U.L(team, "name"), sport.icon ? sport.icon + " " + U.L(sport, "name") : "", me.phone].filter(Boolean).map(E).join(" · ") + "</p>" +
+      '<a class="text-link" href="#" id="p-logout">' + E(T("m_logout")) + "</a></div></div></section>" +
+      '<section class="section"><div class="container">' +
+      "<h2>" + E(T("m_upcoming")) + "</h2>" +
+      (upcoming.length ? '<div class="grid grid--2">' + upcoming.map(f => U.fixtureCard(f, teams)).join("") + "</div>" : empty("m_no_match")) +
+      '<h2 style="margin-top:2rem">' + E(T("m_past")) + "</h2>" +
+      (pastRes.length ? '<div class="stack">' + pastRes.map(r => resultRow(r, teams)).join("") + "</div>" : empty("m_no_match")) +
+      '<div class="card pad" style="margin-top:2rem"><h2>' + E(T("m_profile")) + "</h2><p>" + E(U.L(me, "bio") || me.bio_bn || "") + "</p></div>" +
+      '<a class="text-link" href="players.html">← ' + E(T("players_title")) + "</a></div></section>";
+    document.getElementById("p-logout").addEventListener("click", () => { S.playerLogout(); location.href = "index.html"; });
+  };
+
   /* ================= LEGAL / 404 ================= */
   PAGES.privacy = function (main) {
-    main.innerHTML = '<section class="page-hero"><div class="container"><h1>' + E(T("privacy_title")) + '</h1><p class="muted">' + U.num(S.list("reports").length ? "" : "") + E(U.fmtDate(window.SPUS_DATA.pages.privacy_updated)) + '</p></div></section><section class="section"><div class="container"><div class="card pad"><p>' + H(T("privacy_body")) + "</p></div></div></section>";
+    main.innerHTML = '<section class="page-hero"><div class="container"><h1>' + E(T("privacy_title")) + '</h1><p class="muted">' + E(U.fmtDate(window.SPUS_DATA.pages.privacy_updated)) + '</p></div></section><section class="section"><div class="container"><div class="card pad"><p>' + H(T("privacy_body")) + "</p></div></div></section>";
   };
   PAGES.terms = function (main) {
     main.innerHTML = '<section class="page-hero"><div class="container"><h1>' + E(T("terms_title")) + '</h1><p class="muted">' + E(U.fmtDate(window.SPUS_DATA.pages.terms_updated)) + '</p></div></section><section class="section"><div class="container"><div class="card pad"><p>' + H(T("terms_body")) + "</p></div></div></section>";
@@ -650,6 +800,6 @@
   /* ================= boot ================= */
   document.addEventListener("DOMContentLoaded", () => {
     const page = document.body.dataset.page || "error";
-    window.SPUS_STORE.ready().then(() => U.boot(main => (PAGES[page] || PAGES.error)(main)));
+    U.boot(main => (PAGES[page] || PAGES.error)(main));
   });
 })();

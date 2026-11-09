@@ -5,8 +5,8 @@
   const OVERLAY = "spus_overlay_";
   const SUBS = "spus_submissions";
   const SETTINGS = "spus_settings";
-  const IMPORTED = "spus_imported";
   const AUTH = "spus_auth";
+  const REGS = "spus_player_regs";
   const LANG = "spus_lang";
   const ENTITIES = ["news", "events", "notices", "years", "sports", "tournaments", "teams", "players", "fixtures", "results", "standings", "committee", "gallery", "timeline", "donation_methods", "stats", "site", "about", "reports"];
 
@@ -15,9 +15,9 @@
   function uid(p) { return (p || "x") + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
   const roleSections = {
-    super: ["dashboard", "news", "events", "notices", "years", "sports", "tournaments", "teams", "players", "fixtures", "results", "standings", "committee", "gallery", "donations", "submissions", "settings"],
+    super: ["dashboard", "regs", "news", "events", "notices", "years", "sports", "tournaments", "teams", "players", "fixtures", "results", "standings", "committee", "gallery", "donations", "submissions", "settings"],
     editor: ["dashboard", "news", "events", "notices", "gallery", "submissions"],
-    sports: ["dashboard", "sports", "tournaments", "teams", "players", "fixtures", "results", "standings"],
+    sports: ["dashboard", "regs", "sports", "tournaments", "teams", "players", "fixtures", "results", "standings"],
     donation: ["dashboard", "donations"]
   };
 
@@ -26,53 +26,13 @@
     /* ---------- language ---------- */
     lang() { return localStorage.getItem(LANG) || "bn"; },
     setLang(l) { localStorage.setItem(LANG, l); },
-    /* ---------- published content file (content.json committed to the repo) ---------- */
-    contentLayer: null,
-    effBase(entity) {
-      const il = this.importedLayer();
-      if (il && Array.isArray(il.entities && il.entities[entity])) return il.entities[entity].slice();
-      if (this.contentLayer && Array.isArray(this.contentLayer.entities && this.contentLayer.entities[entity])) return this.contentLayer.entities[entity].slice();
-      return (window.SPUS_DATA[entity] || []).slice();
-    },
-    importedLayer() { return jget(IMPORTED, null); },
-    _loadContentFile() {
-      this.contentLayer = null;
-      try {
-        const settled = Promise.race([
-          fetch("content.json", { cache: "no-cache" }),
-          new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 2500))
-        ]).then(r => (r && r.ok ? r.json() : null)).then(c => {
-          if (c && c.kind === "spus-content") { this.contentLayer = c; window.dispatchEvent(new Event("spus-content-loaded")); }
-        }).catch(() => {});
-        this._contentSettled = settled; /* boot waits only until this probe settles, not a fixed 4s */
-        return settled;
-      } catch (e) { this._contentSettled = Promise.resolve(); /* ignore */ }
-    },
-    ready() {
-      if (!this._readyP) this._readyP = Promise.race([
-        new Promise(res => window.addEventListener("spus-content-loaded", res, { once: true })),
-        this._contentSettled || new Promise(() => {}),
-        new Promise(res => setTimeout(res, 4000))
-      ]);
-      return this._readyP;
-    },
-    /* Snapshot of all publishable content (what admin exports as content.json) */
-    contentSnapshot() {
-      const ents = ["news", "events", "notices", "sports", "tournaments", "teams", "players", "fixtures", "results", "standings", "committee", "gallery", "timeline", "reports"];
-      const entities = {};
-      ents.forEach(e => { entities[e] = this.list(e); });
-      return { kind: "spus-content", version: 2, at: new Date().toISOString(), entities: entities, settings: this.settings() };
-    },
-    importContentJson(bundle) {
-      if (!bundle || !bundle.entities || typeof bundle.entities !== "object") throw new Error("bad content bundle");
-      jset(IMPORTED, { kind: "spus-content", version: bundle.version || 2, at: bundle.at || new Date().toISOString(), entities: bundle.entities, settings: bundle.settings || {} });
-    },
     /* ---------- overlay CRUD ---------- */
     ov(entity) { return jget(OVERLAY + entity, { added: [], changed: {}, deleted: [] }); },
     saveOv(entity, ov) { jset(OVERLAY + entity, ov); },
+    async loadApproved() { /* approved players are written into data.js by the server; no remote merge needed */ },
     list(entity) {
       const ov = this.ov(entity);
-      const base = this.effBase(entity);
+      const base = (window.SPUS_DATA[entity] || []).slice();
       const out = [];
       base.forEach(r => { if (ov.deleted.indexOf(r.id) === -1) out.push(ov.changed[r.id] || r); });
       ov.added.forEach(r => { if (ov.deleted.indexOf(r.id) === -1) out.push(ov.changed[r.id] || r); });
@@ -90,7 +50,7 @@
     },
     del(entity, id) { const ov = this.ov(entity); ov.deleted.push(id); this.saveOv(entity, ov); },
     /* ---------- site settings / stats / donation methods / about (object-style overrides) ---------- */
-    settings() { const cs = (this.contentLayer && this.contentLayer.settings) || {}; const il = this.importedLayer(); const cis = (il && il.settings) || {}; return Object.assign({}, cs, cis, jget(SETTINGS, {})); },
+    settings() { return jget(SETTINGS, {}); },
     saveSettings(patch) { const s = this.settings(); Object.keys(patch).forEach(k => { s[k] = patch[k]; }); jset(SETTINGS, s); },
     site() {
       const o = this.settings();
@@ -141,7 +101,7 @@
       if (this.serverMode) { return fetch("/api/" + type, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rec) }).then(r => r.json()).catch(() => rec); }
       return Promise.resolve(rec);
     },
-    _localSub(type, rec) { const all = jget(SUBS, { contact: [], donation: [] }); all[type].push(rec); jset(SUBS, all); return rec; },
+    _localSub(type, rec) { const all = jget(SUBS, { contact: [], donation: [] }); if (!all[type]) all[type] = []; all[type].push(rec); jset(SUBS, all); return rec; },
     putSub(type, id, patch) {
       if (this.serverMode) { fetch(["/api/", type, "/", id, "?", "key", "="].join("") + encodeURIComponent(localStorage.getItem("spus_api_key") || ""), { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) }); }
       const all = jget(SUBS, { contact: [], donation: [] });
@@ -154,28 +114,80 @@
       all[type] = (all[type] || []).filter(r => r.id !== id);
       jset(SUBS, all);
     },
+    /* ---------- player registrations ---------- */
+    regs() { return (jget(REGS, []) || []).slice().sort((a, b) => b.ts - a.ts); },
+    async fetchRegs() {
+      if (this.serverMode) {
+        try {
+          const key = localStorage.getItem("spus_api_key") || "";
+          const rq = "/api/player-register?key=" + encodeURIComponent(key);
+          const r = await Promise.race([fetch(rq), new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 3000))]);
+          if (r.ok) { const d = await r.json(); if (d.ok) return (d.items || []).slice().sort((a, b) => b.ts - a.ts); }
+        } catch (e) { /* fall through */ }
+      }
+      return this.regs();
+    },
+    addReg(rec) {
+      rec.ts = Date.now(); rec.id = uid("reg"); rec.status = "pending";
+      const all = jget(REGS, []); all.push(rec); jset(REGS, all);
+      if (this.serverMode) {
+        return fetch("/api/player-register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rec) }).then(r => r.json()).catch(() => rec);
+      }
+      return Promise.resolve(rec);
+    },
+    putReg(id, patchObj) {
+      if (this.serverMode) { fetch("/api/player-register/" + id + "?key=" + encodeURIComponent(localStorage.getItem("spus_api_key") || ""), { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patchObj) }); }
+      let all = jget(REGS, []);
+      all = (all || []).map(r => (r.id === id ? Object.assign({}, r, patchObj) : r));
+      jset(REGS, all);
+    },
+    delReg(id) {
+      if (this.serverMode) { fetch("/api/player-register/" + id + "?key=" + encodeURIComponent(localStorage.getItem("spus_api_key") || ""), { method: "DELETE" }); }
+      let all = jget(REGS, []);
+      all = (all || []).filter(r => r.id !== id);
+      jset(REGS, all);
+    },
     /* ---------- auth (demo-grade for static preview; server/ provides real auth) ---------- */
     async login(user, pass) {
       const stored = jget(AUTH, null);
       if (stored) {
         const h = await this._sha(pass);
+        if (!h || !stored.hash) return false;
         if (user === stored.user && h === stored.hash) { this._session(stored.role || "super"); return true; }
         return false;
       }
-      if (user === "admin" && pass === "spus2026") { this._session("super"); return true; }
+      if (user === "admin" && pass === "spus2026") { this._session("super"); if (this.serverMode) localStorage.setItem("spus_api_key", pass); return true; }
       return false;
     },
     _session(role) { sessionStorage.setItem("spus_session", JSON.stringify({ user: "admin", role: role, at: Date.now() })); },
     async changePassword(newPass) {
+      const h = await this._sha(newPass);
+      if (!h) throw new Error("secure-context-required");
       const stored = jget(AUTH, { user: "admin", hash: null, role: "super" });
-      stored.hash = await this._sha(newPass);
+      stored.hash = h;
       jset(AUTH, stored);
     },
     current() { try { return JSON.parse(sessionStorage.getItem("spus_session")); } catch (e) { return null; } },
     logout() { sessionStorage.removeItem("spus_session"); },
     can(section) { const c = this.current(); if (!c) return false; const list = roleSections[c.role] || []; return list.indexOf(section) !== -1; },
+    playerCurrent() { try { return JSON.parse(sessionStorage.getItem("spus_player") || "null"); } catch (e) { return null; } },
+    async playerLogin(phone, pass) {
+      const sha = await this._sha(pass);
+      if (this.serverMode) {
+        try {
+          const r = await fetch("/api/player-login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone, password: sha }) });
+          const d = await r.json();
+          if (d.ok) { sessionStorage.setItem("spus_player", JSON.stringify(d.player)); return true; }
+          return false;
+        } catch (e) { return false; }
+      }
+      const regs = (jget(REGS, []) || []).filter(r => r.status === "approved" && r.phone === phone && r.password === sha);
+      if (regs.length) { sessionStorage.setItem("spus_player", JSON.stringify(regs[0])); return true; }
+      return false;
+    },
+    playerLogout() { sessionStorage.removeItem("spus_player"); },
     _sha(txt) {
-      if (!(window.crypto && crypto.subtle)) return Promise.resolve("n/a");
+      if (!(window.crypto && crypto.subtle)) return Promise.resolve(null);
       const data = new TextEncoder().encode(txt);
       return crypto.subtle.digest("SHA-256", data).then(b => Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, "0")).join(""));
     },
@@ -193,20 +205,13 @@
     },
     resetDemo() {
       ENTITIES.forEach(e => localStorage.removeItem(OVERLAY + e));
-      localStorage.removeItem(SETTINGS); localStorage.removeItem(SUBS); localStorage.removeItem(IMPORTED);
+      localStorage.removeItem(SETTINGS); localStorage.removeItem(SUBS);
     },
     /* ---------- server detection ---------- */
     init() {
-      this.contentLayer = null;
-      this._loadContentFile();
-      /* Probe for the optional Node backend. Skipped on static GitHub Pages hosting
-         (a server can never be present there), which also keeps the browser console free
-         of a 404 log on every page load. */
-      if (!/(^|\.)github\.io$/i.test(location.hostname)) {
-        try {
-          fetch("/api/ping").then(r => r.json()).then(d => { if (d && d.ok) this.serverMode = true; }).catch(() => {});
-        } catch (e) { /* ignore */ }
-      }
+      try {
+        fetch("/api/ping").then(r => r.json()).then(d => { if (d && d.ok) { this.serverMode = true; this.loadApproved(); } }).catch(() => {});
+      } catch (e) { /* ignore */ }
     }
   };
   window.SPUS_STORE = Store;

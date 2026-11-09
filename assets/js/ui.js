@@ -110,16 +110,16 @@
     if (c.instagram) social.push('<a href="' + UI.esc(c.instagram) + '" rel="noopener">Instagram</a>');
     if (c.youtube) social.push('<a href="' + UI.esc(c.youtube) + '" rel="noopener">YouTube</a>');
     if (c.threads) social.push('<a href="' + UI.esc(c.threads) + '" rel="noopener">Threads</a>');
-    const quick = [["index.html", "nav_home"], ["about.html", "nav_about"], ["news.html", "nav_news"], ["events.html", "nav_events"], ["sports.html", "nav_sports"], ["players.html", "nav_players"], ["committee.html", "nav_committee"], ["archive.html", "nav_archive"], ["gallery.html", "nav_gallery"], ["donate.html", "nav_donate"], ["contact.html", "nav_contact"]];
+    const quick = [["index.html", "nav_home"], ["about.html", "nav_about"], ["news.html", "nav_news"], ["events.html", "nav_events"], ["sports.html", "nav_sports"], ["players.html", "nav_players"], ["committee.html", "nav_committee"], ["archive.html", "nav_archive"], ["gallery.html", "nav_gallery"], ["donate.html", "nav_donate"], ["contact.html", "nav_contact"], ["register.html", "r_cta"], ["player-login.html", "p_login"]];
     document.getElementById("site-footer").innerHTML =
       '<div class="container footer-grid">' +
       '<div class="footer-brand"><img src="assets/img/logo.svg" alt="" width="52" height="52"><p><strong>' + UI.esc(lang === "en" ? site.name_en : site.name_bn) + "</strong></p><p class='muted'>" + UI.esc(UI.t("footer_about")) + "</p></div>" +
-      '<div><h2>' + UI.esc(UI.t("quick_links")) + '</h3><ul class="footer-links">' + quick.map(([h, k]) => '<li><a href="' + h + '">' + UI.esc(UI.t(k)) + "</a></li>").join("") + "</ul></div>" +
-      '<div><h2>' + UI.esc(UI.t("contact_info")) + '</h3><ul class="footer-contact">' +
+      '<div><h3>' + UI.esc(UI.t("quick_links")) + '</h3><ul class="footer-links">' + quick.map(([h, k]) => '<li><a href="' + h + '">' + UI.esc(UI.t(k)) + "</a></li>").join("") + "</ul></div>" +
+      '<div><h3>' + UI.esc(UI.t("contact_info")) + '</h3><ul class="footer-contact">' +
       "<li>📍 " + UI.esc(addr) + " " + (UI.isPlaceholder(addr) ? UI.phChip : "") + "</li>" +
       "<li>📞 " + UI.esc(c.phone) + " " + (UI.isPlaceholder(c.phone) ? UI.phChip : "") + "</li>" +
       "<li>✉️ " + UI.esc(c.email) + " " + (UI.isPlaceholder(c.email) ? UI.phChip : "") + "</li></ul>" +
-      "<h2>" + UI.esc(UI.t("follow_us")) + '</h3><p class="footer-social">' + (social.length ? social.join(" · ") : '<span class="muted">[Facebook · Instagram · YouTube]</span> ' + UI.phChip) + "</p></div></div>" +
+      "<h3>" + UI.esc(UI.t("follow_us")) + '</h3><p class="footer-social">' + (social.length ? social.join(" · ") : '<span class="muted">[Facebook · Instagram · YouTube]</span> ' + UI.phChip) + "</p></div></div>" +
       '<div class="footer-bottom"><div class="container footer-bottom-inner"><p>© ' + UI.num(new Date().getFullYear()) + " " + UI.esc(UI.t("rights")) + '</p><p><a href="privacy.html">' + UI.esc(UI.t("privacy")) + '</a> · <a href="terms.html">' + UI.esc(UI.t("terms")) + '</a> · <a href="admin.html" rel="nofollow">' + UI.esc(UI.t("nav_admin")) + "</a></p></div>" +
       '<div class="container footer-demo muted">' + UI.esc(UI.t("demo_note")) + "</div></div>";
   };
@@ -176,6 +176,26 @@
     els.forEach(el => io.observe(el));
   };
 
+  /* ---------- image resize (public forms) ---------- */
+  UI.resizeImage = function (file, max) {
+    return new Promise(function (resolve) {
+      const fr = new FileReader();
+      fr.onload = function () {
+        const img = new Image();
+        img.onload = function () {
+          const k = Math.min(1, max / Math.max(img.width, img.height));
+          const c = document.createElement("canvas");
+          c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          resolve(c.toDataURL("image/jpeg", 0.78));
+        };
+        img.onerror = function () { resolve(fr.result); };
+        img.src = fr.result;
+      };
+      fr.readAsDataURL(file);
+    });
+  };
+
   /* ---------- csv / download ---------- */
   UI.download = function (filename, content, mime) {
     const blob = new Blob([content], { type: mime || "text/plain;charset=utf-8" });
@@ -196,7 +216,10 @@
       '<a class="text-link" href="article.html?item=' + encodeURIComponent(n.slug || n.id) + '">' + UI.esc(UI.t("read_more")) + " →</a></div></article>";
   };
   UI.eventCard = function (ev) {
-    return '<article class="card event-card"><div class="event-date"><strong>' + UI.num(new Date(ev.date + "T00:00:00").getDate()) + "</strong><span>" + UI.fmtDate(ev.date).split(" ")[1] + "</span></div>" +
+    const _evd = ev.date ? new Date(ev.date + "T00:00:00") : null;
+    const _day = _evd && !isNaN(_evd) ? UI.num(_evd.getDate()) : "—";
+    const _mon = _evd && !isNaN(_evd) ? (UI.fmtDate(ev.date).split(" ")[1] || "") : "";
+    return '<article class="card event-card"><div class="event-date"><strong>' + _day + "</strong><span>" + _mon + "</span></div>" +
       '<div class="card-body"><div class="card-meta">' + UI.statusChip(ev.status) + "</div>" +
       '<h3 class="card-title"><a href="events.html?item=' + encodeURIComponent(ev.id) + '">' + UI.esc(UI.L(ev, "title")) + "</a></h3>" +
       '<p class="muted">🕘 ' + UI.fmtDate(ev.date) + (ev.time_start ? " · " + UI.num(ev.time_start) : "") + "</p>" +
@@ -225,10 +248,13 @@
       '<div class="fixture-meta">' + UI.fmtDate(r.date) + " · " + UI.esc(UI.L(r, "venue")) + (r.potm_bn ? " · " + UI.esc(UI.t("potm")) + ": " + UI.esc(UI.pick(r.potm_bn, r.potm_en)) : "") + "</div></article>";
   };
   UI.playerCard = function (p) {
+    const pos = [p.position_code, UI.L(p, "position")].filter(Boolean).map(UI.esc).join(" · ");
+    const cap = p.is_captain ? ' <span class="cap-badge">C</span>' : (p.is_vice_captain ? ' <span class="cap-badge">VC</span>' : "");
+    const rank = (p.ranking != null && p.ranking !== "") ? ' <span class="rank-pill">#' + UI.esc(p.ranking) + "</span>" : "";
     return '<article class="card player-card"><a class="card-media avatar-media" href="player.html?p=' + encodeURIComponent(p.slug || p.id) + '" tabindex="-1" aria-hidden="true"><img loading="lazy" src="' + (p.image || UI.avatar(UI.L(p, "name"), p.id)) + '" alt=""></a>' +
       '<div class="card-body player-body"><span class="jersey">' + UI.num(p.jersey) + "</span>" +
-      '<h3 class="card-title"><a href="player.html?p=' + encodeURIComponent(p.slug || p.id) + '">' + UI.esc(UI.L(p, "name")) + "</a></h3>" +
-      '<p class="muted">' + UI.esc(UI.L(p, "position")) + "</p></div></article>";
+      '<h3 class="card-title"><a href="player.html?p=' + encodeURIComponent(p.slug || p.id) + '">' + UI.esc(UI.L(p, "name")) + "</a>" + cap + rank + "</h3>" +
+      '<p class="muted">' + (pos ? '<span class="pos-badge">' + pos + "</span>" : "") + "</p></div></article>";
   };
   UI.memberCard = function (m) {
     return '<article class="card member-card"><img class="member-photo" loading="lazy" src="' + (m.photo || UI.avatar(UI.L(m, "name"), m.id)) + '" alt="' + UI.esc(UI.L(m, "name")) + '">' +

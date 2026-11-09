@@ -4,6 +4,7 @@
   const T = k => U.t(k), E = U.esc;
   const root = () => document.getElementById("admin-root");
   let currentSection = "dashboard";
+  const ROLE_KEY = { super: "a_role_admin", editor: "a_role_editor", sports: "a_role_sports", donation: "a_role_donation" };
 
   const LBL = {
     title_bn: "শিরোনাম (বাংলা)", title_en: "Title (English)", slug: "SLUG (URL)", date: "তারিখ", end_date: "শেষ তারিখ",
@@ -17,6 +18,11 @@
     champion_team_id: "চ্যাম্পিয়ন দল", runnerup_team_id: "রানার-আপ দল", stat_columns: "স্ট্যাট কলাম", season: "সিজন",
     short: "সংক্ষেপ (৩ অক্ষর)", color: "রং", sports: "খেলা IDs (কমা দিয়ে)",
     jersey: "জার্সি নম্বর", position_bn: "পজিশন (বাংলা)", position_en: "Position (English)", team_id: "দল",
+    position_code: "পজিশন কোড (ST/GK/CM/BAT…)", nickname: "ডাকনাম",
+    is_captain: "অধিনায়ক", is_vice_captain: "সহ-অধিনায়ক",
+    dob: "জন্ম তারিখ", height_cm: "উচ্চতা (সেমি)", weight_kg: "ওজন (কেজি)",
+    foot: "পছন্দের পা", birthplace: "জন্মস্থান",
+    ranking: "র‍্যাংকিং", rating: "রেটিং (0-10)",
     tournament_id: "টুর্নামেন্ট", active: "সক্রিয়", bio_bn: "পরিচিতি (বাংলা)", bio_en: "Bio (English)",
     achievements_bn: "অর্জন (প্রতি লাইনে একটি)", achievements_en: "Achievements (one per line)",
     round_bn: "রাউন্ড (বাংলা)", round_en: "Round (English)", time: "সময়", team_a_id: "দল ক", team_b_id: "দল খ",
@@ -33,13 +39,13 @@
 
   /* ---------------- login ---------------- */
   function showLogin() {
-    root().innerHTML = '<main class="login-wrap"><div class="login-card">' + '<h1 class="sr-only">' + E(T("a_login_title")) + "</h1>" +
+    root().innerHTML = '<div class="login-wrap"><div class="login-card">' +
       '<div class="brand-line"><img src="assets/img/logo.svg" alt=""><div><strong>' + E(S.site().name_bn) + "</strong><div class='muted small'>" + E(T("a_login_title")) + "</div></div></div>" +
       '<form id="login-form" class="admin-form"><div class="fld"><label for="u">' + E(T("a_username")) + '</label><input id="u" autocomplete="username" required></div>' +
       '<div class="fld"><label for="p">' + E(T("a_password")) + '</label><input id="p" type="password" autocomplete="current-password" required></div>' +
       '<button class="btn btn--primary" type="submit">' + E(T("a_login_btn")) + "</button>" +
       '<p class="form-status" id="login-status"></p></form>' +
-      '<p class="login-note">🔐 ' + E(T("a_demo_note")) + "</p></div></main>";
+      '<p class="login-note">🔐 ' + E(T("a_demo_note")) + "</p></div></div>";
     document.getElementById("login-form").addEventListener("submit", async e => {
       e.preventDefault();
       const ok = await S.login(document.getElementById("u").value.trim(), document.getElementById("p").value);
@@ -51,7 +57,7 @@
   const SECTIONS = [
     ["dashboard", "a_dashboard", "📊"], ["news", "a_news", "📰"], ["events", "a_events", "📅"], ["notices", "a_notices", "📣"],
     ["years", "a_years", "🗓️"], ["sports", "a_sports", "🏆"], ["tournaments", "a_tournaments", "🥇"], ["teams", "a_teams", "🎽"],
-    ["players", "a_players", "🏃"], ["fixtures", "a_fixtures", "🗓"], ["results", "a_results", "⚽"], ["standings", "a_standings", "📈"],
+    ["players", "a_players", "🏃"], ["regs", "a_regs", "📝"], ["fixtures", "a_fixtures", "🗓"], ["results", "a_results", "⚽"], ["standings", "a_standings", "📈"],
     ["committee", "a_committee", "🧑‍💼"], ["gallery", "a_gallery", "🖼️"], ["donations", "a_donations", "💰"],
     ["submissions", "a_submissions", "✉️"], ["settings", "a_settings", "⚙️"]
   ];
@@ -59,15 +65,16 @@
     const cur = S.current();
     if (!cur) { showLogin(); return; }
     const items = SECTIONS.filter(([k]) => S.can(k));
+    if (!items.length) { showLogin(); return; }
     if (!items.some(([k]) => k === currentSection)) currentSection = items[0][0];
     root().innerHTML = '<div class="admin-shell">' +
-      '<aside class="admin-side"><div class="side-brand"><img src="assets/img/logo.svg" alt=""><strong>' + E(S.site().name_bn) + "<span class='muted small' style='color:#8FA79A'> " + E(T("a_role") + ": " + T("a_role_" + cur.role)) + "</span></strong></div>" +
+      '<aside class="admin-side"><div class="side-brand"><img src="assets/img/logo.svg" alt=""><strong>' + E(S.site().name_bn) + "<span class='muted small' style='color:#8FA79A'> " + E(T("a_role") + ": " + T(ROLE_KEY[cur.role] || "a_role_admin")) + "</span></strong></div>" +
       "<nav>" + items.map(([k, kk, ic]) => '<button type="button" data-sec="' + k + '"' + (k === currentSection ? ' class="is-active"' : "") + ">" + ic + " " + E(T(kk)) + "</button>").join("") + "</nav></aside>" +
-      '<main class="admin-main"><div class="admin-topbar"><h1 id="sec-title"></h1><div class="actions">' +
+      '<div class="admin-main"><div class="admin-topbar"><h1 id="sec-title"></h1><div class="actions">' +
       '<span class="mode-badge' + (S.serverMode ? " server" : "") + '">' + E(S.serverMode ? T("a_server_mode") : T("a_local_mode")) + "</span>" +
       '<a class="btn btn--ghost btn--sm" href="index.html">🌐 ' + E(T("nav_home")) + '</a>' +
       '<button class="btn btn--outline btn--sm" id="logout">' + E(T("a_logout")) + "</button></div></div>" +
-      '<div id="sec-body"></div></main></div>';
+      '<div id="sec-body"></div></div></div>';
     root().querySelectorAll("[data-sec]").forEach(b => b.addEventListener("click", () => { currentSection = b.dataset.sec; render(); }));
     document.getElementById("logout").addEventListener("click", () => { S.logout(); render(); });
     const fn = SECTIONS_MAP[currentSection] || dashSection;
@@ -111,7 +118,8 @@
       function fmt(k, r) {
         let v = r[k];
         if (k.endsWith("_id")) { const ent = { sport_id: "sports", team_id: "teams", tournament_id: "tournaments", event_id: "events", winner_team_id: "teams", champion_team_id: "teams", runnerup_team_id: "teams" }[k]; if (ent) { const rec2 = S.get(ent, v); if (rec2) v = U.L(rec2, "name"); } }
-        if (k === "status" || (k === "published" && typeof v === "boolean")) return v ? '<span class="badge ok">' + E(T("st_published")) + "</span>" : '<span class="badge">' + E(T("st_draft")) + "</span>";
+        if (k === "status") return U.statusChip(v);
+        if (k === "published" && typeof v === "boolean") return v ? '<span class="badge ok">' + E(T("st_published")) + "</span>" : '<span class="badge">' + E(T("st_draft")) + "</span>";
         if (Array.isArray(v)) v = v.join(", ");
         if (typeof v === "boolean") return v ? "✓" : "—";
         v = String(v == null ? "" : v);
@@ -132,7 +140,7 @@
         panel.hidden = false;
         panel.innerHTML = '<div class="panel-head"><h2>' + (rec ? "✏️ " + T("a_edit") : "＋ " + T("a_add_new")) + '</h2><button class="icon-btn" id="close-form">✕</button></div>' +
           '<form class="admin-form"><div class="form-row">' +
-          schema.fields.map(f => '<div class="' + (f.full ? "full" : "") + '">' + fieldHtml(f, rec ? rec[f.k] : "") + "</div>").join("") +
+          schema.fields.map(f => '<div class="' + (f.full ? "full" : "") + '">' + fieldHtml(f, rec ? (rec.stats && Object.prototype.hasOwnProperty.call(rec.stats, f.k) ? rec.stats[f.k] : rec[f.k]) : "") + "</div>").join("") +
           '</div><div class="form-foot"><button class="btn btn--primary" type="submit">' + E(T("a_save")) + '</button><button class="btn btn--outline" type="button" id="cancel-form">' + E(T("a_cancel")) + "</button></div></form>";
         panel.querySelectorAll("[data-img]").forEach(inp => inp.addEventListener("change", () => {
           const file = inp.files[0]; if (!file) return;
@@ -158,7 +166,6 @@
     dashboard: dashSection,
     news: crudSection("news", {
       list: ["date", "title_bn", "category", "status", "featured", "image"],
-      arrays: ["achievements_none"],
       fields: [
         { k: "title_bn" }, { k: "title_en" }, { k: "slug", hint: 1 }, { k: "date", t: "date" }, { k: "year", t: "number" },
         { k: "category", t: "select", opts: CATS.map(c => ({ v: c, l: T("cat_" + c) })) },
@@ -209,11 +216,17 @@
       fields: [{ k: "name_bn" }, { k: "name_en" }, { k: "short" }, { k: "color", t: "color" }, { k: "sports" }]
     }),
     players: crudSection("players", {
-      list: ["name_bn", "jersey", "team_id", "sport_id", "active"],
+      list: ["name_bn", "jersey", "position_code", "team_id", "sport_id", "active"],
       fields: [
         { k: "name_bn" }, { k: "name_en" }, { k: "slug" }, { k: "jersey", t: "number" },
-        { k: "position_bn" }, { k: "position_en" }, { k: "team_id", t: "select", opts: relOpts("teams") },
+        { k: "position_code" }, { k: "nickname" },
+        { k: "position_bn" }, { k: "position_en" },
+        { k: "is_captain", t: "check" }, { k: "is_vice_captain", t: "check" },
+        { k: "team_id", t: "select", opts: relOpts("teams") },
         { k: "sport_id", t: "select", opts: relOpts("sports") }, { k: "tournament_id", t: "select", opts: relOpts("tournaments") },
+        { k: "dob", t: "date" }, { k: "height_cm", t: "number" }, { k: "weight_kg", t: "number" },
+        { k: "foot", t: "select", opts: [{ v: "Left", l: "Left / বাম" }, { v: "Right", l: "Right / ডান" }, { v: "Both", l: "Both / দুই" }] },
+        { k: "birthplace" }, { k: "ranking", t: "number" }, { k: "rating", t: "number" },
         { k: "active", t: "check" }, { k: "image", t: "image" },
         { k: "bio_bn", t: "textarea", full: 1 }, { k: "bio_en", t: "textarea", full: 1 },
         { k: "matches", t: "number" }, { k: "goals", t: "number" }, { k: "assists", t: "number" }, { k: "yellow", t: "number" }, { k: "red", t: "number" },
@@ -248,6 +261,7 @@
     years: yearsSection,
     donations: donationsSection,
     submissions: submissionsSection,
+    regs: regsSection,
     settings: settingsSection
   };
 
@@ -308,12 +322,12 @@
     const comms = S.list("committee").slice().sort((a, b) => b.year - a.year);
     body.innerHTML = '<div class="panel"><div class="panel-head"><h2>' + E(T("a_committee")) + '</h2><button class="btn btn--primary btn--sm" id="add-comm">＋ ' + E(T("a_add_new")) + '</button></div>' +
       '<div class="tbl-wrap"><table class="admin-table"><thead><tr><th>' + E(T("year")) + '</th><th>' + E(lbl("label_bn")) + '</th><th>' + E(T("members")) + '</th><th></th></tr></thead><tbody>' +
-      comms.map(c => "<tr><td>" + U.num(c.year) + "</td><td>" + E(U.L(c, "label")) + "</td><td>" + U.num(c.members.length) + '</td><td><div class="row-actions"><button class="icon-btn" data-edit="' + c.id + '">✏️ ' + E(T("a_edit")) + '</button><button class="icon-btn danger" data-del="' + c.id + '">🗑</button></div></td></tr>').join("") +
+      comms.map(c => "<tr><td>" + U.num(c.year) + "</td><td>" + E(U.L(c, "label")) + "</td><td>" + U.num((c.members || []).length) + '</td><td><div class="row-actions"><button class="icon-btn" data-edit="' + c.id + '">✏️ ' + E(T("a_edit")) + '</button><button class="icon-btn danger" data-del="' + c.id + '">🗑</button></div></td></tr>').join("") +
       "</tbody></table></div></div><div class='panel form-panel' id='cform' hidden></div>";
     const form = body.querySelector("#cform");
     function openForm(rec) {
       form.hidden = false;
-      const members = rec ? rec.members.map(m => Object.assign({}, m)) : [{ id: "m" + Date.now(), name_bn: "", name_en: "", position_key: "member", position_bn: "", position_en: "", photo: null, bio_bn: "", bio_en: "", joined: new Date().getFullYear(), active: true }];
+      const members = rec ? (rec.members || []).map(m => Object.assign({}, m)) : [{ id: "m" + Date.now(), name_bn: "", name_en: "", position_key: "member", position_bn: "", position_en: "", photo: null, bio_bn: "", bio_en: "", joined: new Date().getFullYear(), active: true }];
       const keys = ["president", "vp", "gs", "joint_gs", "treasurer", "sports_sec", "org_sec", "member"];
       function drawRows() {
         form.innerHTML = '<div class="panel-head"><h2>' + (rec ? "✏️" : "＋") + " " + E(T("a_committee")) + ' (' + U.num(rec ? rec.year : "") + ')</h2><button class="icon-btn" id="cc">✕</button></div>' +
@@ -368,12 +382,12 @@
     const albums = S.list("gallery");
     body.innerHTML = '<div class="panel"><div class="panel-head"><h2>' + E(T("a_gallery")) + '</h2><button class="btn btn--primary btn--sm" id="add-alb">＋ ' + E(T("a_add_new")) + '</button></div>' +
       '<div class="tbl-wrap"><table class="admin-table"><thead><tr><th>' + E(T("date")) + '</th><th>' + E(lbl("title_bn")) + '</th><th>' + E(T("year")) + '</th><th>' + E(T("photos")) + '</th><th></th></tr></thead><tbody>' +
-      albums.map(g => "<tr><td>" + U.fmtDate(g.date) + "</td><td>" + E(U.L(g, "title")) + "</td><td>" + U.num(g.year) + "</td><td>" + U.num(g.photos.length) + '</td><td><div class="row-actions"><button class="icon-btn" data-edit="' + g.id + '">✏️ ' + E(T("a_edit")) + '</button><button class="icon-btn danger" data-del="' + g.id + '">🗑</button></div></td></tr>').join("") +
+      albums.map(g => "<tr><td>" + U.fmtDate(g.date) + "</td><td>" + E(U.L(g, "title")) + "</td><td>" + U.num(g.year) + "</td><td>" + U.num((g.photos || []).length) + '</td><td><div class="row-actions"><button class="icon-btn" data-edit="' + g.id + '">✏️ ' + E(T("a_edit")) + '</button><button class="icon-btn danger" data-del="' + g.id + '">🗑</button></div></td></tr>').join("") +
       "</tbody></table></div></div><div class='panel form-panel' id='gform' hidden></div>";
     const form = body.querySelector("#gform");
     function openForm(rec) {
       form.hidden = false;
-      const photos = rec ? rec.photos.map(p => Object.assign({}, p)) : [];
+      const photos = rec ? (rec.photos || []).map(p => Object.assign({}, p)) : [];
       function drawRows() {
         form.innerHTML = '<div class="panel-head"><h2>' + (rec ? "✏️" : "＋") + " " + E(T("albums")) + '</h2><button class="icon-btn" id="gc">✕</button></div>' +
           '<form class="admin-form"><div class="form-row">' +
@@ -518,10 +532,7 @@
         '<div class="fld"><label>' + E(T(kk)) + '</label><input type="number" id="st-' + k + '" value="' + (stats[k] || 0) + '"></div>').join("") +
       '</div><button class="btn btn--primary" type="submit">' + E(T("a_save")) + "</button></form></div>" +
       '<div class="panel form-panel"><h2>' + E(T("a_password_change")) + '</h2><form class="admin-form" id="pw-form"><div class="fld"><label>' + E(T("a_new_password")) + '</label><input id="np" type="password" minlength="6" required></div><button class="btn btn--primary" type="submit">' + E(T("a_save")) + "</button></form></div>" +
-      '<div class="panel"><h2>📦 ' + E(T("a_content_title")) + '</h2>' +
-      '<ol class="muted small" style="padding-left:1.2em"><li>' + E(T("a_content_s1")) + '</li><li>' + E(T("a_content_s2")) + '</li><li>' + E(T("a_content_s3")) + '</li></ol>' +
-      '<div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 18px"><button class="btn btn--primary btn--sm" id="exp-content">⬇ ' + E(T("a_dl_content")) + '</button></div>' +
-      '<h2 style="font-size:1rem">💾 ' + E(T("a_full_backup")) + '</h2>' +
+      '<div class="panel"><h2>💾 ' + E(T("a_export_json")) + " / " + E(T("a_import_json")) + '</h2>' +
       '<p class="muted small">' + E(T("a_local_note")) + '</p>' +
       '<div class="fld" style="max-width:420px"><label>সার্ভার API কী / Server API key (ADMIN_PASSWORD)</label><div style="display:flex;gap:8px"><input id="api-key" value="' + E(localStorage.getItem("spus_api_key") || "") + '"><button class="btn btn--outline btn--sm" type="button" id="save-key">' + E(T("a_save")) + '</button></div><p class="muted small">সার্ভার মোডে জমা পড়তে ও যাচাই/ডিলিট করতে এই কী লাগবে। / Required to read & verify server-mode submissions.</p></div>' +
       '<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn--outline btn--sm" id="exp">⬇ ' + E(T("a_export_json")) + '</button>' +
@@ -542,17 +553,17 @@
     });
     body.querySelector("#pw-form").addEventListener("submit", async e => {
       e.preventDefault();
-      await S.changePassword(body.querySelector("#np").value);
-      body.querySelector("#np").value = "";
-      U.toast("✓ " + T("a_password_change") + " — " + T("a_saved"));
+      try {
+        await S.changePassword(body.querySelector("#np").value);
+        body.querySelector("#np").value = "";
+        U.toast("✓ " + T("a_password_change") + " — " + T("a_saved"));
+      } catch (err) {
+        U.toast(T("a_pw_err"), "error");
+      }
     });
     body.querySelector("#save-key").addEventListener("click", () => {
       localStorage.setItem("spus_api_key", body.querySelector("#api-key").value.trim());
       U.toast("✓ " + T("a_saved"));
-    });
-    body.querySelector("#exp-content").addEventListener("click", () => {
-      U.download("content.json", JSON.stringify(S.contentSnapshot(), null, 2), "application/json");
-      U.toast("⬇ content.json — " + T("a_saved"));
     });
     body.querySelector("#exp").addEventListener("click", () => {
       U.download("spus-data-backup-" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(S.exportAll(), null, 2), "application/json");
@@ -560,14 +571,7 @@
     body.querySelector("#imp").addEventListener("change", e => {
       const f = e.target.files[0]; if (!f) return;
       const fr = new FileReader();
-      fr.onload = () => {
-        try {
-          const b = JSON.parse(fr.result);
-          if (b && b.entities && b.kind === "spus-content") { S.importContentJson(b); }
-          else { S.importAll(b); }
-          U.toast("✓ " + T("a_import_ok")); render();
-        } catch (err) { U.toast(T("a_import_err"), "error"); }
-      };
+      fr.onload = () => { try { S.importAll(JSON.parse(fr.result)); U.toast("✓ " + T("a_import_ok")); render(); } catch (err) { U.toast(T("a_import_err"), "error"); } };
       fr.readAsText(f);
     });
     body.querySelector("#reset").addEventListener("click", () => {
@@ -580,12 +584,14 @@
     const news = S.list("news"), events = S.list("events"), tours = S.list("tournaments"), players = S.list("players");
     const comms = S.list("committee");
     const subs = await S.fetchSubs("contact"), dons = await S.fetchSubs("donation");
-    const memberCount = comms.reduce((a, c) => a + c.members.length, 0);
+    const pendingRegs = (await S.fetchRegs()).filter(r => r.status === "pending");
+    const memberCount = comms.reduce((a, c) => a + (c.members || []).length, 0);
+    const pendingNote = pendingRegs.length ? '<div class="panel" style="margin-bottom:1.2rem;border-left:4px solid #D97706"><strong>📝 ' + pendingRegs.length + ' kheloa registration pending</strong> — bam menu theke 📝 খেলোয়াড় রেজিস্ট্রেশন click kore ✓ অনুমোদন din</div>' : '';
     const verified = dons.filter(d => d.status === "verified").reduce((a, d) => a + (parseFloat(d.amount) || 0), 0);
     const today = new Date().toISOString().slice(0, 10);
     const upcoming = events.filter(e => e.date >= today && e.status !== "cancelled").length;
     const activeTours = tours.filter(t => t.status === "ongoing" || t.status === "registration_open").length;
-    body.innerHTML = '<div class="stat-cards">' +
+    body.innerHTML = pendingNote + '<div class="stat-cards">' +
       [["a_total_news", U.num(news.length)], ["a_upcoming_events", U.num(upcoming)], ["a_active_tournaments", U.num(activeTours)], ["a_total_players", U.num(players.length)], ["a_committee_members", U.num(memberCount)], ["a_total_donations", U.money(verified)], ["a_contact_messages", U.num(subs.length)], ["a_pending_donations", U.num(dons.filter(d => d.status !== "verified").length)]]
         .map(([k, v]) => '<div class="stat-card"><div class="n">' + v + '</div><div class="l">' + E(T(k)) + "</div></div>").join("") + "</div>" +
       '<div class="panel"><h2>' + E(T("a_latest_submissions")) + ' — ' + E(T("a_submissions")) + '</h2><div class="tbl-wrap"><table class="admin-table"><tbody>' +
@@ -596,6 +602,100 @@
       "</tbody></table></div></div>";
   }
 
+  /* ---------------- player registrations ---------------- */
+  function regToPlayer(r) {
+    const sports = S.list("sports");
+    const sp = sports.find(s => String(s.name_en || "").toLowerCase() === String(r.sport || "").toLowerCase()) || sports.find(s => s.name_bn === r.sport) || null;
+    const used = S.list("players").map(p => +p.jersey || 0);
+    let j = parseInt(r.jersey, 10) || 0;
+    if (!j || used.includes(j)) { j = 1; while (used.includes(j)) j++; }
+    let slug = String(r.name_en || r.name_bn || "player").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || ("pl" + Date.now().toString(36));
+    if (S.list("players").some(p => p.slug === slug)) slug = slug + "-" + Date.now().toString(36).slice(-4);
+    return {
+      name_bn: r.name_bn || "", name_en: r.name_en || "", nickname: r.nickname || "",
+      slug: slug, jersey: j,
+      position_code: r.position_code || "", position_bn: r.position_bn || "", position_en: r.position_en || "",
+      team_id: null, sport_id: sp ? sp.id : null, tournament_id: null,
+      dob: r.dob || "", height_cm: r.height_cm || "", weight_kg: r.weight_kg || "",
+      foot: r.foot || "", birthplace: r.birthplace || "",
+      image: r.photo || null, active: true, demo: false,
+      bio_bn: r.bio_bn || "", bio_en: r.bio_en || "",
+      stats: {},
+      achievements_bn: String(r.achievements_bn || "").split("|").map(s => s.trim()).filter(Boolean),
+      achievements_en: [],
+      phone: r.phone || ""
+    };
+  }
+  function openRegEdit(body, r, done) {
+    const panel = body.querySelector("#reg-form");
+    panel.hidden = false;
+    const fields = [
+      ["name_bn", T("r_name_bn"), "text"], ["name_en", T("r_name_en"), "text"], ["nickname", T("r_nickname"), "text"],
+      ["jersey", T("r_jersey"), "number"], ["sport", T("r_sport"), "text"], ["position_code", T("r_pos_code"), "text"],
+      ["position_bn", T("r_pos_bn"), "text"], ["phone", T("r_phone"), "tel"],
+      ["dob", T("r_dob"), "date"], ["height_cm", T("r_height"), "number"], ["weight_kg", T("r_weight"), "number"],
+      ["birthplace", T("r_birth"), "text"]
+    ];
+    panel.innerHTML = '<div class="panel-head"><h2>✏️ ' + E(T("a_regs")) + '</h2><button class="icon-btn" id="reg-close">✕</button></div>' +
+      '<form class="admin-form"><div class="form-row">' +
+      fields.map(f => '<div class="fld"><label>' + E(f[1]) + '</label><input data-rk="' + f[0] + '" type="' + f[2] + '" value="' + E(r[f[0]] == null ? "" : r[f[0]]) + '"></div>').join("") +
+      '<div class="fld"><label>' + E(T("r_bio")) + '</label><textarea data-rk="bio_bn">' + E(r.bio_bn || "") + "</textarea></div>" +
+      '<div class="fld"><label>' + E(T("r_ach")) + '</label><input data-rk="achievements_bn" value="' + E(r.achievements_bn || "") + '"></div>' +
+      '</div><div class="form-foot"><button class="btn btn--primary" type="submit">' + E(T("a_save")) + '</button></div></form>';
+    panel.querySelector("#reg-close").addEventListener("click", () => { panel.hidden = true; });
+    panel.querySelector("form").addEventListener("submit", e => {
+      e.preventDefault();
+      const patchObj = { status: "pending" };
+      panel.querySelectorAll("[data-rk]").forEach(el => { patchObj[el.dataset.rk] = el.value.trim(); });
+      S.putReg(r.id, patchObj);
+      U.toast("✓ " + T("a_saved")); panel.hidden = true; done();
+    });
+    panel.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  async function regsSection(body) {
+    const regs = await S.fetchRegs();
+    body.innerHTML = '<div class="panel"><div class="panel-head"><h2>' + E(T("a_regs")) + ' <span class="count-pill">' + U.num(regs.filter(r => r.status === "pending").length) + '</span></h2><button class="btn btn--outline btn--sm" id="csv-reg">⬇ ' + E(T("a_export_csv")) + "</button></div>" +
+      '<p class="muted small">' + E(T("a_regs_note")) + "</p>" +
+      '<div class="tbl-wrap"><table class="admin-table"><thead><tr><th></th><th>' + E(T("a_sender")) + "</th><th>" + E(T("sport")) + "</th><th>" + E(T("phone")) + "</th><th>" + E(T("a_timestamp")) + "</th><th>" + E(T("status")) + "</th><th></th></tr></thead><tbody>" +
+      (regs.length ? regs.map(r => {
+        const img = r.photo || U.avatar(r.name_bn || r.name_en || "?", r.id);
+        const st = r.status === "approved" ? '<span class="badge ok">' + E(T("a_verified")) + "</span>" : r.status === "rejected" ? '<span class="badge">' + E(T("a_reject")) + "</span>" : '<span class="badge wait">' + E(T("a_pending")) + "</span>";
+        return "<tr><td><img src='" + E(img) + "' style='width:44px;height:44px;border-radius:50%;object-fit:cover' alt=''></td>" +
+          "<td><strong>" + E(r.name_bn || r.name_en) + "</strong>" + (r.name_en ? "<br><span class='muted small'>" + E(r.name_en) + "</span>" : "") + "</td>" +
+          "<td>" + E(r.sport || "") + (r.position_code ? " · " + E(r.position_code) : "") + "</td>" +
+          "<td>" + E(r.phone || "") + "</td><td>" + U.fmtStamp(r.ts) + "</td><td>" + st + "</td>" +
+          "<td><div class='row-actions'>" + (r.status === "pending" ? "<button class='icon-btn' data-edit='" + r.id + "'>✏️</button><button class='icon-btn' data-approve='" + r.id + "'>✓ " + E(T("a_approve")) + "</button>" : "") + "<button class='icon-btn danger' data-del='" + r.id + "'>🗑</button></div></td></tr>";
+      }).join("") : '<tr><td colspan="7"><div class="empty-state">' + E(T("a_no_regs")) + "</div></td></tr>") +
+      "</tbody></table></div></div><div class='panel form-panel' id='reg-form' hidden></div>";
+    body.querySelector("#csv-reg").addEventListener("click", () => {
+      const rows = [["ts", "name_bn", "name_en", "sport", "position_code", "phone", "status", "id"]];
+      regs.forEach(r => rows.push([new Date(r.ts).toISOString(), r.name_bn, r.name_en, r.sport, r.position_code, r.phone, r.status, r.id]));
+      U.download("player-registrations.csv", U.bom + U.csv(rows), "text/csv;charset=utf-8");
+    });
+    function find(id) { return regs.find(x => x.id === id); }
+    body.querySelectorAll("[data-approve]").forEach(b => b.addEventListener("click", () => {
+      const r = find(b.dataset.approve); if (!r) return;
+      const rec = regToPlayer(r);
+      S.add("players", rec);
+      S.putReg(r.id, { status: "approved", player_id: rec.id });
+      if (S.serverMode) {
+        fetch("/api/player-to-site", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: localStorage.getItem("spus_api_key") || "", player: rec }) }).catch(() => {});
+        S.loadApproved().then(() => regsSection(body));
+        U.toast("✓ " + T("a_reg_approved"));
+        return;
+      }
+      U.toast("✓ " + T("a_reg_approved"));
+      regsSection(body);
+    }));
+    body.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => {
+      if (!confirm(T("a_confirm_delete"))) return;
+      S.delReg(b.dataset.del); regsSection(body);
+    }));
+    body.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", () => {
+      const r = find(b.dataset.edit); if (!r) return;
+      openRegEdit(body, r, () => regsSection(body));
+    }));
+  }
   /* ---------------- image resize ---------------- */
   function resizeImage(file, max) {
     return new Promise(resolve => {
@@ -609,6 +709,7 @@
           c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
           resolve(c.toDataURL("image/jpeg", 0.82));
         };
+        img.onerror = () => resolve(fr.result);
         img.src = fr.result;
       };
       fr.readAsDataURL(file);
