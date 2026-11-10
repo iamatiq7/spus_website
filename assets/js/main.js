@@ -55,20 +55,21 @@
     }
     /* hero */
     html += '<section class="hero"><div class="container hero-inner">' +
+      '<img src="assets/img/logo.svg" alt="" width="84" height="84" style="border-radius:20px;box-shadow:0 14px 36px rgba(16,185,129,.28);flex:none">' +
       '<p class="hero-kicker">' + E(lang === "en" ? site.name_en : site.name_bn) + "</p>" +
       '<h1>' + E(T("hero_title")) + "</h1>" +
       '<p class="hero-sub">' + E(T("hero_sub")) + "</p>" +
-      '<div class="hero-actions"><a class="btn btn--outline" href="about.html">' + E(T("hero_btn_about")) + '</a><a class="btn btn--primary" href="donate.html">' + E(T("hero_btn_donate")) + "</a></div>" +
+      '<div class="hero-actions"><a class="btn btn--primary" href="register.html">' + E(T("r_cta")) + '</a><a class="btn btn--outline" href="player-login.html">' + E(T("p_login")) + '</a><a class="btn btn--outline" href="about.html">' + E(T("hero_btn_about")) + '</a><a class="btn btn--outline" href="donate.html">' + E(T("hero_btn_donate")) + "</a></div>" +
       "</div></section>" +
       (S.list("players").length ? "" : '<section class="section"><div class="container"><div class="card pad" style="text-align:center"><h2>' + E(T("r_cta")) + '</h2><p class="muted">' + E(T("r_sub")) + '</p><div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap"><a class="btn btn--primary btn--lg" href="register.html">' + E(T("r_submit")) + ' →</a><a class="btn btn--outline btn--lg" href="player-login.html">' + E(T("p_login")) + ' →</a></div></div></div></section>');
 
     /* news */
-    html += '<section class="section">' + sectionHead(T("sec_news"), "news.html", "view_all_news") +
-      '<div class="grid grid--3">' + (news.length ? news.map(U.newsCard).join("") : empty("empty_news")) + "</div></section>";
+    if (news.length) html += '<section class="section">' + sectionHead(T("sec_news"), "news.html", "view_all_news") +
+      '<div class="grid grid--3">' + news.map(U.newsCard).join("") + "</div></section>";
 
     /* events */
-    html += '<section class="section section--tint">' + sectionHead(T("sec_events"), "events.html") +
-      '<div class="grid grid--3">' + (events.length ? events.map(U.eventCard).join("") : empty("empty_events")) + "</div></section>";
+    if (events.length) html += '<section class="section section--tint">' + sectionHead(T("sec_events"), "events.html") +
+      '<div class="grid grid--3">' + events.map(U.eventCard).join("") + "</div></section>";
 
     /* tournament */
     if (tour) {
@@ -96,8 +97,8 @@
     }
 
     /* players */
-    html += '<section class="section section--tint">' + sectionHead(T("sec_players"), "players.html") +
-      '<div class="grid grid--4">' + (featured.length ? featured.map(U.playerCard).join("") : empty("empty_players")) + "</div></section>";
+    if (featured.length) html += '<section class="section section--tint">' + sectionHead(T("sec_players"), "players.html") +
+      '<div class="grid grid--4">' + featured.map(U.playerCard).join("") + "</div></section>";
 
     /* committee */
     if (cMembers.length) {
@@ -117,9 +118,8 @@
       '</ul></div><a class="btn btn--primary btn--lg" href="donate.html">' + E(T("donate_cta_btn")) + " →</a></div></section>";
 
     /* gallery */
-    html += '<section class="section">' + sectionHead(T("sec_gallery"), "gallery.html", "view_all_photos") +
-      (photos.length ? '<div class="gallery-grid">' + photos.map((p, i) => '<button class="gallery-item" data-lb="' + gallery.id + '" data-idx="' + i + '"><img loading="lazy" src="' + (p.src || U.img(p.id, 400, 300, "")) + '" alt="' + E(U.L(p, "caption")) + '"></button>').join("") + "</div>" : empty("empty_gallery")) +
-      "</section>";
+    if (photos.length) html += '<section class="section">' + sectionHead(T("sec_gallery"), "gallery.html", "view_all_photos") +
+      '<div class="gallery-grid">' + photos.map((p, i) => '<button class="gallery-item" data-lb="' + gallery.id + '" data-idx="' + i + '"><img loading="lazy" src="' + (p.src || U.img(p.id, 400, 300, "")) + '" alt="' + E(U.L(p, "caption")) + '"></button>').join("") + "</div></section>";
     main.innerHTML = html;
     main.querySelectorAll("[data-lb]").forEach(btn => btn.addEventListener("click", () => {
       const alb = S.list("gallery").find(g => g.id === btn.dataset.lb);
