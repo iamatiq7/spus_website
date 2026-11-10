@@ -31,10 +31,7 @@ window.SPUS_DATA = {
   ],
   tournaments: [],
   teams: [],
-  players: [
-    { id: "npmw97fwgj", slug: "live-test", name_bn: "à¦²à¦¾à¦‡à¦­ à¦Ÿà§‡à¦¸à§à¦Ÿ", name_en: "LIVE TEST", jersey: 1, position_bn: "", position_en: "", position_code: "ST", team_id: null, sport_id: null, tournament_id: null, dob: "", height_cm: "", weight_kg: "", foot: "", birthplace: "", active: true, image: null, demo: false,
-      bio_bn: "", bio_en: "", stats: {}, achievements_bn: [], achievements_en: [] },
-],
+  players: [],
   fixtures: [],
   results: [],
   standings: [],
