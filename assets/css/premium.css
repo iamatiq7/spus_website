@@ -80,3 +80,32 @@ section.section { padding: 2.6rem 0; }
 .hero-inner { display:flex; gap:22px; align-items:center; flex-wrap:wrap; }
 .hero-inner img { flex:none; }
 .players-hero-row { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+
+/* header / footer full-width dark — no white patches */
+#site-header, .site-header, .header-inner {
+  background: #0A0E13 !important;
+  background-image: none !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+#site-header .header-inner {
+  background: transparent !important;
+  max-width: 100% !important;
+  padding-inline: clamp(14px, 3vw, 28px);
+}
+#site-footer, .footer-grid, .footer-bottom, .footer-bottom-inner {
+  background: #0A0E13 !important;
+  background-image: none !important;
+}
+#site-footer { border-top: 1px solid var(--line); }
+html, body { background: #0A0E13 !important; }
+.nav-link { white-space: nowrap !important; }
+.main-nav ul { flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; }
+.main-nav ul::-webkit-scrollbar { display: none; }
+.brand-logo { object-fit: cover; }
+@media (max-width: 1440px) {
+  .main-nav { display: none !important; }
+  .nav-burger { display: flex !important; }
+  .header-search { display: none !important; }
+}
+.nav-link { white-space: nowrap !important; }
+.main-nav ul { flex-wrap: nowrap !important; }

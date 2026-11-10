@@ -26,7 +26,7 @@
       '<a target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=' + enc + '">Facebook</a>' +
       '<a target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=' + enc + "&text=" + encT + '">X</a>' +
       '<a target="_blank" rel="noopener" href="https://wa.me/?text=' + encT + "%20" + enc + '">WhatsApp</a>' +
-      '<button type="button" id="copy-link">ðŸ”— ' + E(S.lang() === "bn" ? "à¦²à¦¿à¦‚à¦• à¦•à¦ªà¦¿" : "Copy link") + "</button></div>";
+      '<button type="button" id="copy-link">🔍— ' + E(S.lang() === "bn" ? "à¦²à¦¿à¦‚à¦• à¦•à¦ªà¦¿" : "Copy link") + "</button></div>";
   }
 
   /* ================= HOME ================= */
@@ -55,7 +55,7 @@
     }
     /* hero */
     html += '<section class="hero"><div class="container hero-inner">' +
-      '<img src="assets/img/logo.jpg" alt="" width="84" height="84" style="border-radius:20px;box-shadow:0 14px 36px rgba(16,185,129,.28);flex:none">' +
+      '<img src="assets/img/club-logo.jpg" alt="" width="84" height="84" style="border-radius:20px;box-shadow:0 14px 36px rgba(16,185,129,.28);flex:none">' +
       '<p class="hero-kicker">' + E(lang === "en" ? site.name_en : site.name_bn) + "</p>" +
       '<h1>' + E(T("hero_title")) + "</h1>" +
       '<p class="hero-sub">' + E(T("hero_sub")) + "</p>" +
@@ -88,7 +88,7 @@
         "<li><span>" + E(T("venue")) + "</span><strong>" + E(U.L(tour, "venue")) + "</strong></li>" +
         (champ ? "<li><span>" + E(T("champion")) + "</span><strong>" + E(U.L(champ, "name")) + "</strong></li>" : "") +
         (runner ? "<li><span>" + E(T("runner_up")) + "</span><strong>" + E(U.L(runner, "name")) + "</strong></li>" : "") +
-        (st ? "<li><span>" + E(T("tab_standings")) + "</span><strong>" + (st.rows[0] ? E(U.L(teamById(teams, st.rows[0].team_id), "name")) + " Â· " + U.num(st.rows[0].points) + " " + E(T("points")) : "â€”") + "</strong></li>" : "") +
+        (st ? "<li><span>" + E(T("tab_standings")) + "</span><strong>" + (st.rows[0] ? E(U.L(teamById(teams, st.rows[0].team_id), "name")) + "  ·  " + U.num(st.rows[0].points) + " " + E(T("points")) : "â€”") + "</strong></li>" : "") +
         "</ul>" +
         '<p class="muted">' + E(U.L(tour, "desc")) + " " + U.demoChip + "</p>" +
         '<div class="fixture-list">' + (fixtures.length ? fixtures.map(f => U.fixtureCard(f, teams)).join("") : "") + (results.length ? results.map(r => U.resultCard(r, teams)).join("") : "") + "</div>" +
@@ -185,7 +185,7 @@
     const url = location.href;
     main.innerHTML = '<article class="article container">' +
       '<a class="text-link" href="news.html">â† ' + E(T("back_news")) + "</a>" +
-      '<div class="card-meta" style="margin:1rem 0">' + U.catChip(n.category) + '<time datetime="' + E(n.date) + '">' + U.fmtDate(n.date) + "</time> Â· " + E(T("author")) + ": " + E(U.L(n, "author")) + "</div>" +
+      '<div class="card-meta" style="margin:1rem 0">' + U.catChip(n.category) + '<time datetime="' + E(n.date) + '">' + U.fmtDate(n.date) + "</time>  ·  " + E(T("author")) + ": " + E(U.L(n, "author")) + "</div>" +
       "<h1>" + E(U.L(n, "title")) + "</h1>" +
       '<img class="article-cover" loading="lazy" src="' + U.recordImage(n, 1100, 560) + '" alt="' + E(U.L(n, "title")) + '">' +
       '<p class="article-lede">' + E(U.L(n, "excerpt")) + "</p>" +
@@ -206,9 +206,9 @@
         '<div class="card-meta" style="margin:1rem 0">' + U.statusChip(ev.status) + "</div><h1>" + E(U.L(ev, "title")) + "</h1>" +
         '<img class="article-cover" loading="lazy" src="' + U.recordImage(ev, 1100, 560) + '" alt="">' +
         '<ul class="fact-list fact-list--row">' +
-        "<li><span>ðŸ“… " + E(T("date")) + "</span><strong>" + U.fmtDate(ev.date) + (ev.end_date && ev.end_date !== ev.date ? " â€“ " + U.fmtDate(ev.end_date) : "") + "</strong></li>" +
-        "<li><span>ðŸ•˜ " + E(T("time")) + "</span><strong>" + U.num(ev.time_start || "â€”") + (ev.time_end ? " â€“ " + U.num(ev.time_end) : "") + "</strong></li>" +
-        "<li><span>ðŸ“ " + E(T("event_location")) + "</span><strong>" + E(U.L(ev, "location")) + "</strong></li>" +
+        "<li><span>📍… " + E(T("date")) + "</span><strong>" + U.fmtDate(ev.date) + (ev.end_date && ev.end_date !== ev.date ? " â€“ " + U.fmtDate(ev.end_date) : "") + "</strong></li>" +
+        "<li><span>🕐 " + E(T("time")) + "</span><strong>" + U.num(ev.time_start || "â€”") + (ev.time_end ? " â€“ " + U.num(ev.time_end) : "") + "</strong></li>" +
+        "<li><span>📍 " + E(T("event_location")) + "</span><strong>" + E(U.L(ev, "location")) + "</strong></li>" +
         "<li><span>ðŸ§‘â€ðŸ¤â€ðŸ§‘ " + E(T("organizer")) + "</span><strong>" + E(U.L(ev, "organizer")) + "</strong></li></ul>" +
         '<div class="article-body"><p>' + H(U.L(ev, "desc")) + "</p></div></article>";
       return;
@@ -256,12 +256,12 @@
       mini(T("tab_players"), "players", '<div class="grid grid--4">' + aPlayers.map(U.playerCard).join("") + "</div>", "players.html", "empty_players", aPlayers.length) +
       mini(T("tab_committee"), "committee", '<div class="grid grid--4">' + (aComm[0] ? (aComm[0].members || []).map(U.memberCard).join("") : "") + "</div>", "committee.html?year=" + y, "empty_committee", aComm.length) +
       mini(T("tab_gallery"), "gallery", '<div class="grid grid--4">' + aGal.map(g => '<a class="card album-card" href="gallery.html?album=' + g.id + '"><img loading="lazy" src="' + (g.cover || (g.photos[0] && g.photos[0].src) || U.img(g.cover_seed || g.id, 400, 280)) + '" alt=""><div class="card-body"><h3>' + E(U.L(g, "title")) + "</h3><p class='muted'>" + U.num((g.photos || []).length) + " " + E(T("photos")) + "</p></div></a>").join("") + "</div>", "gallery.html?year=" + y, "empty_gallery", aGal.length) +
-      mini(T("tab_reports"), "reports", '<div class="stack">' + aRep.map(r => '<div class="row-link is-static">ðŸ“„ ' + E(U.L(r, "title")) + U.demoChip + "</div>").join("") + "</div>", null, "empty_reports", aRep.length) +
+      mini(T("tab_reports"), "reports", '<div class="stack">' + aRep.map(r => '<div class="row-link is-static">📍„ ' + E(U.L(r, "title")) + U.demoChip + "</div>").join("") + "</div>", null, "empty_reports", aRep.length) +
       "</div></div></section>";
   };
   function fixtureRow(f, teams) {
     const a = teamById(teams, f.team_a_id), b = teamById(teams, f.team_b_id);
-    return '<div class="row-link is-static">' + E(U.L(a, "name")) + " <b>" + E(T("vs")) + "</b> " + E(U.L(b, "name")) + " <time>" + U.fmtDate(f.date) + " Â· " + U.statusChip(f.status) + "</time></div>";
+    return '<div class="row-link is-static">' + E(U.L(a, "name")) + " <b>" + E(T("vs")) + "</b> " + E(U.L(b, "name")) + " <time>" + U.fmtDate(f.date) + "  ·  " + U.statusChip(f.status) + "</time></div>";
   }
   function resultRow(r, teams) {
     const a = teamById(teams, r.team_a_id), b = teamById(teams, r.team_b_id);
@@ -281,7 +281,7 @@
         '<img loading="lazy" src="' + U.recordImage(t, 480, 300) + '" alt="">' +
         '<div class="card-body"><div class="card-meta">' + U.statusChip(t.status) + " <span class='chip chip--cat'>" + E(sp.icon + " " + U.L(sp, "name")) + "</span></div>" +
         "<h3>" + E(U.L(t, "name")) + "</h3>" +
-        '<p class="muted">' + U.num(t.year) + " Â· " + U.num(t.teams_count) + " " + E(T("teams")) + (champ ? " Â· ðŸ† " + E(champ) : "") + "</p></div></a>";
+        '<p class="muted">' + U.num(t.year) + "  ·  " + U.num(t.teams_count) + " " + E(T("teams")) + (champ ? "  ·  ðŸ† " + E(champ) : "") + "</p></div></a>";
     }
     main.innerHTML = '<section class="page-hero"><div class="container"><h1>' + E(T("sports_title")) + '</h1><p class="muted">' + E(T("sports_sub")) + '</p></div></section>' +
       '<section class="section"><div class="container">' +
@@ -318,7 +318,7 @@
         (champ ? "<li><span>ðŸ† " + E(T("champion")) + "</span><strong>" + E(U.L(champ, "name")) + "</strong></li>" : "") +
         (runner ? "<li><span>" + E(T("runner_up")) + "</span><strong>" + E(U.L(runner, "name")) + "</strong></li>" : "") +
         "</ul><p>" + E(U.L(t, "desc")) + "</p>" +
-        '<div class="team-chips">' + teams.filter(x => x.sports && x.sports.includes(t.sport_id)).map(x => '<span class="team-badge" style="--c:' + E(x.color) + '">' + E(x.short) + "</span> " + E(U.L(x, "name"))).join(" Â· ") + "</div></div>";
+        '<div class="team-chips">' + teams.filter(x => x.sports && x.sports.includes(t.sport_id)).map(x => '<span class="team-badge" style="--c:' + E(x.color) + '">' + E(x.short) + "</span> " + E(U.L(x, "name"))).join("  ·  ") + "</div></div>";
     } else if (tab === "fixtures") {
       body = tFix.length ? '<div class="grid grid--2">' + tFix.map(f => U.fixtureCard(f, teams)).join("") + "</div>" : empty("empty_fixtures");
     } else if (tab === "results") {
@@ -330,16 +330,16 @@
     } else if (tab === "stats") {
       if (t.stat_columns === "cricket") {
         const top = tPlayers.slice().sort((a, b) => ((b.stats || {}).runs || 0) - ((a.stats || {}).runs || 0)).slice(0, 5);
-        body = '<div class="card pad"><h3>' + E(T("st_runs")) + '</h3><ol class="rank-list">' + top.map(p => "<li><strong>" + E(U.L(p, "name")) + "</strong> <span class='muted'>" + E(U.L(teamMap[p.team_id] || {}, "name")) + " Â· " + U.num((p.stats || {}).runs) + " " + E(T("st_runs")) + "</span></li>").join("") + "</ol></div>";
+        body = '<div class="card pad"><h3>' + E(T("st_runs")) + '</h3><ol class="rank-list">' + top.map(p => "<li><strong>" + E(U.L(p, "name")) + "</strong> <span class='muted'>" + E(U.L(teamMap[p.team_id] || {}, "name")) + "  ·  " + U.num((p.stats || {}).runs) + " " + E(T("st_runs")) + "</span></li>").join("") + "</ol></div>";
       } else {
         const top = tPlayers.slice().sort((a, b) => ((b.stats || {}).goals || 0) - ((a.stats || {}).goals || 0)).slice(0, 5);
-        body = '<div class="card pad"><h3>' + E(T("st_goals")) + '</h3><ol class="rank-list">' + top.map(p => "<li><strong>" + E(U.L(p, "name")) + "</strong> <span class='muted'>" + E(U.L(teamMap[p.team_id] || {}, "name")) + " Â· " + U.num((p.stats || {}).goals) + " " + E(T("st_goals")) + "</span></li>").join("") + "</ol></div>";
+        body = '<div class="card pad"><h3>' + E(T("st_goals")) + '</h3><ol class="rank-list">' + top.map(p => "<li><strong>" + E(U.L(p, "name")) + "</strong> <span class='muted'>" + E(U.L(teamMap[p.team_id] || {}, "name")) + "  ·  " + U.num((p.stats || {}).goals) + " " + E(T("st_goals")) + "</span></li>").join("") + "</ol></div>";
       }
     } else if (tab === "gallery") {
       body = albums.length ? '<div class="grid grid--3">' + albums.map(g => '<a class="card album-card" href="gallery.html?album=' + g.id + '"><img loading="lazy" src="' + (g.cover || (g.photos[0] && g.photos[0].src) || U.img(g.id, 400, 280)) + '" alt=""><div class="card-body"><h3>' + E(U.L(g, "title")) + "</h3><p class='muted'>" + U.num((g.photos || []).length) + " " + E(T("photos")) + "</p></div></a>").join("") + "</div>" : empty("empty_gallery");
     }
     const tabs = [["overview", "tab_overview"], ["fixtures", "tab_fixtures2"], ["results", "tab_results"], ["standings", "tab_standings"], ["players", "tab_players"], ["stats", "tab_stats2"], ["gallery", "tab_gallery"]];
-    main.innerHTML = '<section class="page-hero"><div class="container"><div class="card-meta">' + U.statusChip(t.status) + " <span class='chip chip--cat'>" + E(sp.icon + " " + U.L(sp, "name")) + "</span></div><h1>" + E(U.L(t, "name")) + '</h1><p class="muted">' + U.fmtDate(t.start_date) + " â€“ " + U.fmtDate(t.end_date) + " Â· " + E(U.L(t, "venue")) + "</p></div></section>" +
+    main.innerHTML = '<section class="page-hero"><div class="container"><div class="card-meta">' + U.statusChip(t.status) + " <span class='chip chip--cat'>" + E(sp.icon + " " + U.L(sp, "name")) + "</span></div><h1>" + E(U.L(t, "name")) + '</h1><p class="muted">' + U.fmtDate(t.start_date) + " â€“ " + U.fmtDate(t.end_date) + "  ·  " + E(U.L(t, "venue")) + "</p></div></section>" +
       '<section class="section"><div class="container">' +
       '<div class="tabs" role="tablist">' + tabs.map(([k, kk]) => '<a class="tab' + (tab === k ? " is-active" : "") + '" href="tournament.html?t=' + E(t.slug) + "&tab=" + k + '">' + E(T(kk)) + "</a>").join("") + "</div>" +
       body + "</div></section>";
@@ -406,9 +406,9 @@
         '<div class="result-team' + (r.winner_team_id === a.id ? " is-winner" : "") + '"><span class="team-badge" style="--c:' + E(a.color) + '">' + E(a.short) + "</span><strong>" + E(U.L(a, "name")) + "</strong></div>" +
         '<div class="result-score">' + U.num(r.score_a) + "<br><small>" + E(T("vs")) + "</small><br>" + U.num(r.score_b) + "</div>" +
         '<div class="result-team' + (r.winner_team_id === b.id ? " is-winner" : "") + '"><strong>' + E(U.L(b, "name")) + "</strong><span class=\"team-badge\" style=\"--c:" + E(b.color) + '">' + E(b.short) + "</span></div></div>" +
-        '<div class="fixture-meta">' + U.fmtDate(r.date) + " Â· ðŸ“ " + E(U.L(r, "venue")) +
-        (winner ? " Â· ðŸ† " + E(T("winner")) + ": <strong>" + E(U.L(winner, "name")) + "</strong>" : " Â· " + E(T("st_scheduled"))) +
-        (r.potm_bn ? " Â· â­ " + E(T("potm")) + ": " + E(U.pick(r.potm_bn, r.potm_en)) : "") + "</div>" +
+        '<div class="fixture-meta">' + U.fmtDate(r.date) + "  ·  📍 " + E(U.L(r, "venue")) +
+        (winner ? "  ·  ðŸ† " + E(T("winner")) + ": <strong>" + E(U.L(winner, "name")) + "</strong>" : "  ·  " + E(T("st_scheduled"))) +
+        (r.potm_bn ? "  ·  â­ " + E(T("potm")) + ": " + E(U.pick(r.potm_bn, r.potm_en)) : "") + "</div>" +
         (U.L(r, "report") ? '<p class="muted">' + E(U.L(r, "report")) + "</p>" : "") + "</article>";
     }
   };
@@ -448,7 +448,7 @@
       : [["st_matches", pstats.matches], ["st_goals", pstats.goals], ["st_assists", pstats.assists], ["st_yellow", pstats.yellow], ["st_red", pstats.red]];
     const posCode = String(p.position_code || "").toUpperCase();
     const badges = [];
-    if (posCode || U.L(p, "position")) badges.push('<span class="pos-badge">' + E(posCode || U.L(p, "position")) + (posCode && U.L(p, "position") ? " Â· " + E(U.L(p, "position")) : "") + "</span>");
+    if (posCode || U.L(p, "position")) badges.push('<span class="pos-badge">' + E(posCode || U.L(p, "position")) + (posCode && U.L(p, "position") ? "  ·  " + E(U.L(p, "position")) : "") + "</span>");
     if (p.is_captain) badges.push('<span class="cap-badge">ðŸŽ— ' + E(T("captain")) + "</span>");
     else if (p.is_vice_captain) badges.push('<span class="cap-badge">ðŸŽ— ' + E(T("vice_captain")) + "</span>");
     if (p.ranking != null && p.ranking !== "") badges.push('<span class="rank-pill">#' + E(p.ranking) + " " + E(T("ranking")) + "</span>");
@@ -463,7 +463,7 @@
       [T("pos"), U.L(p, "position") || posCode],
       [T("team"), U.L(team, "name")],
       [T("sport"), (sport.icon ? sport.icon + " " : "") + U.L(sport, "name")],
-      [T("dob"), p.dob ? U.fmtDate(p.dob) + (age !== "" && !isNaN(age) ? " Â· " + U.num(age) + " " + T("yrs") : "") : ""],
+      [T("dob"), p.dob ? U.fmtDate(p.dob) + (age !== "" && !isNaN(age) ? "  ·  " + U.num(age) + " " + T("yrs") : "") : ""],
       [T("height"), p.height_cm != null && p.height_cm !== "" ? U.num(p.height_cm) + " " + T("cm") : ""],
       [T("weight"), p.weight_kg != null && p.weight_kg !== "" ? U.num(p.weight_kg) + " " + T("kg") : ""],
       [T("foot"), footTxt],
@@ -477,7 +477,7 @@
       '<img class="player-hero-photo" src="' + (p.image || U.avatar(U.L(p, "name"), p.id)) + '" alt="' + E(U.L(p, "name")) + '">' +
       '<div><div class="player-badges">' + badges.join("") + "</div>" +
       '<span class="jersey jersey--lg">#' + U.num(p.jersey) + "</span><h1>" + E(U.L(p, "name")) + (p.nickname ? ' <small class="muted">â€œ' + E(p.nickname) + "â€</small>" : "") + "</h1>" +
-      '<p class="muted">' + [U.L(p, "position"), U.L(team, "name"), sport.icon ? sport.icon + " " + U.L(sport, "name") : ""].filter(Boolean).map(E).join(" Â· ") + "</p></div></div></section>" +
+      '<p class="muted">' + [U.L(p, "position"), U.L(team, "name"), sport.icon ? sport.icon + " " + U.L(sport, "name") : ""].filter(Boolean).map(E).join("  ·  ") + "</p></div></div></section>" +
       '<section class="section"><div class="container">' +
       (infos.length ? '<h2 class="visually-hidden">' + E(T("personal")) + "</h2>" + '<div class="info-grid">' + infos.map(function (x) { return '<div class="info-item"><span>' + E(x[0]) + "</span><strong>" + E(x[1]) + "</strong></div>"; }).join("") + "</div>" : "") +
       '<div class="stat-cards" style="margin-top:1.2rem">' + statDefs.map(([k, v]) => '<div class="stat"><span class="stat-num">' + U.num(v == null ? 0 : v) + "</span><span class='stat-label'>" + E(T(k)) + "</span></div>").join("") + "</div>" +
@@ -511,7 +511,7 @@
       const album = albums.find(g => g.id === ab);
       if (!album) { main.innerHTML = notFound(); return; }
       const ph = (album.photos || []).map(p => Object.assign({ album: album.id }, p));
-      main.innerHTML = '<section class="page-hero"><div class="container"><a class="text-link" href="gallery.html">â† ' + E(T("gallery_title")) + "</a><h1>" + E(U.L(album, "title")) + '</h1><p class="muted">' + U.fmtDate(album.date) + " Â· " + U.num((album.photos || []).length) + " " + E(T("photos")) + '</p></div></section>' +
+      main.innerHTML = '<section class="page-hero"><div class="container"><a class="text-link" href="gallery.html">â† ' + E(T("gallery_title")) + "</a><h1>" + E(U.L(album, "title")) + '</h1><p class="muted">' + U.fmtDate(album.date) + "  ·  " + U.num((album.photos || []).length) + " " + E(T("photos")) + '</p></div></section>' +
         '<section class="section"><div class="container"><div class="gallery-grid">' +
         ph.map((p, i) => '<button class="gallery-item" data-idx="' + i + '"><img loading="lazy" src="' + (p.src || U.img(p.id, 400, 300, "")) + '" alt="' + E(U.L(p, "caption")) + '"></button>').join("") + "</div></div></section>";
       main.querySelectorAll("[data-idx]").forEach(btn => btn.addEventListener("click", () => U.lightbox(ph, parseInt(btn.dataset.idx, 10))));
@@ -524,7 +524,7 @@
       '<section class="section"><div class="container">' +
       '<div class="filter-bar">' + sel("f-year", years.map(y => ({ v: y, l: U.num(y) })), yr, T("all_years")) +
       sel("f-event", [].concat(S.list("tournaments"), events).map(x => ({ v: x.id, l: U.L(x, "name") })), ev, T("all")) + "</div>" +
-      '<div class="grid grid--3">' + (list.length ? list.map(g => '<a class="card album-card" href="gallery.html?album=' + g.id + '"><img loading="lazy" src="' + (g.cover || (g.photos[0] && g.photos[0].src) || U.img(g.id, 400, 280)) + '" alt=""><div class="card-body"><h3>' + E(U.L(g, "title")) + '</h3><p class="muted">' + U.fmtDate(g.date) + " Â· " + U.num((g.photos || []).length) + " " + E(T("photos")) + '</p></div><div class="album-count">â–¦ ' + U.num((g.photos || []).length) + "</div></a>").join("") : empty("empty_gallery")) + "</div></div></section>";
+      '<div class="grid grid--3">' + (list.length ? list.map(g => '<a class="card album-card" href="gallery.html?album=' + g.id + '"><img loading="lazy" src="' + (g.cover || (g.photos[0] && g.photos[0].src) || U.img(g.id, 400, 280)) + '" alt=""><div class="card-body"><h3>' + E(U.L(g, "title")) + '</h3><p class="muted">' + U.fmtDate(g.date) + "  ·  " + U.num((g.photos || []).length) + " " + E(T("photos")) + '</p></div><div class="album-count">â–¦ ' + U.num((g.photos || []).length) + "</div></a>").join("") : empty("empty_gallery")) + "</div></div></section>";
     bindFilters(["f-year", "f-event"], ["year", "event"], "gallery.html");
   };
 
@@ -533,7 +533,7 @@
     const d = S.donation(), lang = S.lang();
     const methods = d.methods.filter(m => m.id !== "bank");
     const bank = d.methods.find(m => m.id === "bank");
-    function copyBtn(val) { return '<button type="button" class="btn btn--sm btn--outline copy-btn" data-copy="' + E(val) + '">ðŸ“‹ ' + E(T("copy")) + "</button>"; }
+    function copyBtn(val) { return '<button type="button" class="btn btn--sm btn--outline copy-btn" data-copy="' + E(val) + '">📍‹ ' + E(T("copy")) + "</button>"; }
     main.innerHTML = '<section class="page-hero"><div class="container"><h1>' + E(T("donate_title")) + '</h1><p class="muted">' + E(d.headline_bn ? U.pick(d.headline_bn, d.headline_en) : T("donate_sub")) + "</p></div></section>" +
       '<section class="section"><div class="container">' +
       '<div class="callout">â„¹ï¸ ' + E(T("donate_manual_note")) + "</div>" +
@@ -583,7 +583,7 @@
         f.reset();
       });
     });
-    main.querySelectorAll(".copy-btn").forEach(b => b.addEventListener("click", () => { navigator.clipboard.writeText(b.dataset.copy).then(() => { b.textContent = "âœ“ " + T("copied"); setTimeout(() => { b.innerHTML = "ðŸ“‹ " + T("copy"); }, 1600); }); }));
+    main.querySelectorAll(".copy-btn").forEach(b => b.addEventListener("click", () => { navigator.clipboard.writeText(b.dataset.copy).then(() => { b.textContent = "âœ“ " + T("copied"); setTimeout(() => { b.innerHTML = "📍‹ " + T("copy"); }, 1600); }); }));
     function field(id, label, type, req) {
       return '<div class="form-field"><label for="' + id + '">' + E(label) + (req ? ' <span class="req" aria-hidden="true">*</span>' : "") + '</label><input id="' + id + '" name="' + id + '" type="' + type + '"' + (req ? " required" : "") + "></div>";
     }
@@ -597,11 +597,11 @@
     main.innerHTML = '<section class="page-hero"><div class="container"><h1>' + E(T("contact_title")) + '</h1><p class="muted">' + E(T("contact_sub")) + '</p></div></section>' +
       '<section class="section"><div class="container contact-grid">' +
       '<div class="card pad"><h2>' + E(T("contact_info")) + '</h2><ul class="fact-list">' +
-      "<li><span>ðŸ“ " + E(T("address")) + "</span><strong class='" + (U.isPlaceholder(addr) ? "ph-value" : "") + "'>" + E(addr) + "</strong> " + (U.isPlaceholder(addr) ? U.phChip : "") + "</li>" +
-      "<li><span>ðŸ“ž " + E(T("phone_label")) + "</span><strong class='" + (U.isPlaceholder(c.phone) ? "ph-value" : "") + "'>" + E(c.phone) + "</strong> " + (U.isPlaceholder(c.phone) ? U.phChip : "") + "</li>" +
+      "<li><span>📍 " + E(T("address")) + "</span><strong class='" + (U.isPlaceholder(addr) ? "ph-value" : "") + "'>" + E(addr) + "</strong> " + (U.isPlaceholder(addr) ? U.phChip : "") + "</li>" +
+      "<li><span>📍ž " + E(T("phone_label")) + "</span><strong class='" + (U.isPlaceholder(c.phone) ? "ph-value" : "") + "'>" + E(c.phone) + "</strong> " + (U.isPlaceholder(c.phone) ? U.phChip : "") + "</li>" +
       "<li><span>âœ‰ï¸ " + E(T("email_label")) + "</span><strong class='" + (U.isPlaceholder(c.email) ? "ph-value" : "") + "'>" + E(c.email) + "</strong> " + (U.isPlaceholder(c.email) ? U.phChip : "") + "</li></ul>" +
-      "<h2>" + E(T("social_links")) + "</h2><p class='footer-social'>" + (socials.length ? socials.map(([k, l]) => '<a href="' + E(c[k]) + '" rel="noopener">' + l + "</a>").join(" Â· ") : '<span class="muted">[Facebook Â· Instagram Â· YouTube Â· Threads]</span> ' + U.phChip) + "</p></div>" +
-      '<div class="card pad map-card"><h2>ðŸ—ºï¸ ' + E(T("map_note")) + '</h2><div class="map-placeholder" role="img" aria-label="Map placeholder"><span>ðŸ“</span><p class="muted">' + E(T("map_note")) + "</p></div></div>" +
+      "<h2>" + E(T("social_links")) + "</h2><p class='footer-social'>" + (socials.length ? socials.map(([k, l]) => '<a href="' + E(c[k]) + '" rel="noopener">' + l + "</a>").join("  ·  ") : '<span class="muted">[Facebook  ·  Instagram  ·  YouTube  ·  Threads]</span> ' + U.phChip) + "</p></div>" +
+      '<div class="card pad map-card"><h2>ðŸ—ºï¸ ' + E(T("map_note")) + '</h2><div class="map-placeholder" role="img" aria-label="Map placeholder"><span>📍</span><p class="muted">' + E(T("map_note")) + "</p></div></div>" +
       '<div class="card pad contact-form-wrap"><h2>' + E(T("contact_title")) + '</h2>' +
       '<form id="contact-form" class="form" novalidate>' +
       '<div class="form-grid">' +
@@ -635,8 +635,8 @@
     let out = "";
     function group(title, items) { return items.length ? '<div class="card pad" style="margin-bottom:1.5rem"><h2>' + E(title) + ' <span class="count-pill">' + U.num(items.length) + '</span></h2><div class="stack">' + items.join("") + "</div></div>" : ""; }
     if (q) {
-      const news = publishedNews().filter(n => (U.L(n, "title") + " " + U.L(n, "excerpt")).toLowerCase().includes(k)).map(n => '<a class="row-link" href="article.html?item=' + E(n.slug || n.id) + '">ðŸ“° ' + E(U.L(n, "title")) + "<time>" + U.fmtDate(n.date) + "</time></a>");
-      const evs = S.list("events").filter(e => U.L(e, "title").toLowerCase().includes(k)).map(e => '<a class="row-link" href="events.html?item=' + e.id + '">ðŸ“… ' + E(U.L(e, "title")) + "<time>" + U.fmtDate(e.date) + "</time></a>");
+      const news = publishedNews().filter(n => (U.L(n, "title") + " " + U.L(n, "excerpt")).toLowerCase().includes(k)).map(n => '<a class="row-link" href="article.html?item=' + E(n.slug || n.id) + '">📍° ' + E(U.L(n, "title")) + "<time>" + U.fmtDate(n.date) + "</time></a>");
+      const evs = S.list("events").filter(e => U.L(e, "title").toLowerCase().includes(k)).map(e => '<a class="row-link" href="events.html?item=' + e.id + '">📍… ' + E(U.L(e, "title")) + "<time>" + U.fmtDate(e.date) + "</time></a>");
       const pls = S.list("players").filter(p => U.L(p, "name").toLowerCase().includes(k)).map(p => '<a class="row-link" href="player.html?p=' + E(p.slug || p.id) + '">ðŸƒ ' + E(U.L(p, "name")) + "</a>");
       const trs = S.list("tournaments").filter(t => U.L(t, "name").toLowerCase().includes(k)).map(t => '<a class="row-link" href="tournament.html?t=' + E(t.slug) + '">ðŸ† ' + E(U.L(t, "name")) + "</a>");
       const cms = S.list("committee").flatMap(c => (c.members || []).map(m => ({ m, c }))).filter(x => U.L(x.m, "name").toLowerCase().includes(k)).map(x => '<a class="row-link" href="committee.html?year=' + x.c.year + '">ðŸ§‘â€ðŸ’¼ ' + E(U.L(x.m, "name")) + " â€” " + E(U.L(x.m, "position")) + " (" + U.num(x.c.year) + ")</a>");
@@ -759,7 +759,7 @@
       '<div><div class="player-badges"><span class="pos-badge">' + E(me.position_code || T("m_profile")) + "</span>" +
       (me.jersey ? '<span class="jersey jersey--lg">#' + U.num(me.jersey) + "</span>" : "") + "</div>" +
       "<h1>" + E(U.L(me, "name") || me.name_en || me.name_bn) + "</h1>" +
-      '<p class="muted">' + [U.L(me, "position"), U.L(team, "name"), sport.icon ? sport.icon + " " + U.L(sport, "name") : "", me.phone].filter(Boolean).map(E).join(" Â· ") + "</p>" +
+      '<p class="muted">' + [U.L(me, "position"), U.L(team, "name"), sport.icon ? sport.icon + " " + U.L(sport, "name") : "", me.phone].filter(Boolean).map(E).join("  ·  ") + "</p>" +
       '<a class="text-link" href="#" id="p-logout">' + E(T("m_logout")) + "</a></div></div></section>" +
       '<section class="section"><div class="container">' +
       "<h2>" + E(T("m_upcoming")) + "</h2>" +

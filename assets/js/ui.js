@@ -87,11 +87,11 @@
     document.getElementById("site-header").innerHTML =
       '<div class="header-inner container">' +
       '<a class="brand" href="index.html" aria-label="' + UI.esc(name) + '">' +
-      '<img src="assets/img/logo.jpg" alt="" width="44" height="44" class="brand-logo">' +
+      '<img src="assets/img/club-logo.jpg" alt="" width="44" height="44" class="brand-logo">' +
       '<span class="brand-text"><strong>' + UI.esc(name) + "</strong><small>" + UI.esc(lang === "en" ? site.tagline_en : site.tagline_bn) + "</small></span></a>" +
       '<nav class="main-nav" aria-label="Main"><ul>' + links + "</ul></nav>" +
       '<div class="header-actions">' +
-      '<form class="header-search" action="search.html" role="search"><input type="search" name="q" placeholder="' + UI.esc(UI.t("search_ph")) + '" aria-label="' + UI.esc(UI.t("search_btn")) + '"><button type="submit" aria-label="' + UI.esc(UI.t("search_btn")) + '">ðŸ”</button></form>' +
+      '<form class="header-search" action="search.html" role="search"><input type="search" name="q" placeholder="' + UI.esc(UI.t("search_ph")) + '" aria-label="' + UI.esc(UI.t("search_btn")) + '"><button type="submit" aria-label="' + UI.esc(UI.t("search_btn")) + '">🔍</button></form>' +
       '<div class="lang-switch" role="group" aria-label="Language"><button type="button" data-lang="bn"' + (lang === "bn" ? ' aria-pressed="true"' : "") + '>à¦¬à¦¾à¦‚à¦²à¦¾</button><span aria-hidden="true">|</span><button type="button" data-lang="en"' + (lang === "en" ? ' aria-pressed="true"' : "") + '>English</button></div>' +
       '<a class="btn btn--primary btn--sm header-donate" href="donate.html">' + UI.esc(UI.t("nav_donate")) + "</a>" +
       '<button class="nav-burger" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Menu"><span></span><span></span><span></span></button>' +
@@ -113,14 +113,14 @@
     const quick = [["index.html", "nav_home"], ["about.html", "nav_about"], ["news.html", "nav_news"], ["events.html", "nav_events"], ["sports.html", "nav_sports"], ["players.html", "nav_players"], ["committee.html", "nav_committee"], ["archive.html", "nav_archive"], ["gallery.html", "nav_gallery"], ["donate.html", "nav_donate"], ["contact.html", "nav_contact"], ["register.html", "r_cta"], ["player-login.html", "p_login"]];
     document.getElementById("site-footer").innerHTML =
       '<div class="container footer-grid">' +
-      '<div class="footer-brand"><img src="assets/img/logo.jpg" alt="" width="52" height="52"><p><strong>' + UI.esc(lang === "en" ? site.name_en : site.name_bn) + "</strong></p><p class='muted'>" + UI.esc(UI.t("footer_about")) + "</p></div>" +
+      '<div class="footer-brand"><img src="assets/img/club-logo.jpg" alt="" width="52" height="52"><p><strong>' + UI.esc(lang === "en" ? site.name_en : site.name_bn) + "</strong></p><p class='muted'>" + UI.esc(UI.t("footer_about")) + "</p></div>" +
       '<div><h3>' + UI.esc(UI.t("quick_links")) + '</h3><ul class="footer-links">' + quick.map(([h, k]) => '<li><a href="' + h + '">' + UI.esc(UI.t(k)) + "</a></li>").join("") + "</ul></div>" +
       '<div><h3>' + UI.esc(UI.t("contact_info")) + '</h3><ul class="footer-contact">' +
-      "<li>ðŸ“ " + UI.esc(addr) + " " + (UI.isPlaceholder(addr) ? UI.phChip : "") + "</li>" +
-      "<li>ðŸ“ž " + UI.esc(c.phone) + " " + (UI.isPlaceholder(c.phone) ? UI.phChip : "") + "</li>" +
+      "<li>📍 " + UI.esc(addr) + " " + (UI.isPlaceholder(addr) ? UI.phChip : "") + "</li>" +
+      "<li>📍ž " + UI.esc(c.phone) + " " + (UI.isPlaceholder(c.phone) ? UI.phChip : "") + "</li>" +
       "<li>âœ‰ï¸ " + UI.esc(c.email) + " " + (UI.isPlaceholder(c.email) ? UI.phChip : "") + "</li></ul>" +
-      "<h3>" + UI.esc(UI.t("follow_us")) + '</h3><p class="footer-social">' + (social.length ? social.join(" Â· ") : '<span class="muted">[Facebook Â· Instagram Â· YouTube]</span> ' + UI.phChip) + "</p></div></div>" +
-      '<div class="footer-bottom"><div class="container footer-bottom-inner"><p>Â© ' + UI.num(new Date().getFullYear()) + " " + UI.esc(UI.t("rights")) + '</p><p><a href="privacy.html">' + UI.esc(UI.t("privacy")) + '</a> Â· <a href="terms.html">' + UI.esc(UI.t("terms")) + '</a> Â· <a href="admin.html" rel="nofollow">' + UI.esc(UI.t("nav_admin")) + "</a></p></div>" +
+      "<h3>" + UI.esc(UI.t("follow_us")) + '</h3><p class="footer-social">' + (social.length ? social.join("  ·  ") : '<span class="muted">[Facebook  ·  Instagram  ·  YouTube]</span> ' + UI.phChip) + "</p></div></div>" +
+      '<div class="footer-bottom"><div class="container footer-bottom-inner"><p>© ' + UI.num(new Date().getFullYear()) + " " + UI.esc(UI.t("rights")) + '</p><p><a href="privacy.html">' + UI.esc(UI.t("privacy")) + '</a>  ·  <a href="terms.html">' + UI.esc(UI.t("terms")) + '</a>  ·  <a href="admin.html" rel="nofollow">' + UI.esc(UI.t("nav_admin")) + "</a></p></div>" +
       '<div class="container footer-demo muted">' + UI.esc(UI.t("demo_note")) + "</div></div>";
   };
 
@@ -222,8 +222,8 @@
     return '<article class="card event-card"><div class="event-date"><strong>' + _day + "</strong><span>" + _mon + "</span></div>" +
       '<div class="card-body"><div class="card-meta">' + UI.statusChip(ev.status) + "</div>" +
       '<h3 class="card-title"><a href="events.html?item=' + encodeURIComponent(ev.id) + '">' + UI.esc(UI.L(ev, "title")) + "</a></h3>" +
-      '<p class="muted">ðŸ•˜ ' + UI.fmtDate(ev.date) + (ev.time_start ? " Â· " + UI.num(ev.time_start) : "") + "</p>" +
-      '<p class="muted">ðŸ“ ' + UI.esc(UI.L(ev, "location")) + "</p>" +
+      '<p class="muted">🕐 ' + UI.fmtDate(ev.date) + (ev.time_start ? "  ·  " + UI.num(ev.time_start) : "") + "</p>" +
+      '<p class="muted">📍 ' + UI.esc(UI.L(ev, "location")) + "</p>" +
       '<a class="text-link" href="events.html?item=' + encodeURIComponent(ev.id) + '">' + UI.esc(UI.t("view_details")) + " â†’</a></div></article>";
   };
   UI.fixtureCard = function (f, teams) {
@@ -234,8 +234,8 @@
       '<div class="fixture-team"><span class="team-badge" style="--c:' + UI.esc(a.color) + '">' + UI.esc(a.short) + "</span><strong>" + UI.esc(UI.L(a, "name")) + "</strong></div>" +
       '<div class="fixture-vs">' + UI.esc(T("vs")) + "</div>" +
       '<div class="fixture-team"><span class="team-badge" style="--c:' + UI.esc(b.color) + '">' + UI.esc(b.short) + "</span><strong>" + UI.esc(UI.L(b, "name")) + "</strong></div></div>" +
-      '<div class="fixture-meta">' + UI.statusChip(f.status) + " Â· " + UI.esc(UI.L(f, "round")) + " Â· " + UI.fmtDate(f.date) + " Â· " + UI.num(f.time) + "</div>" +
-      '<div class="fixture-meta muted">ðŸ“ ' + UI.esc(UI.L(f, "venue")) + "</div></article>";
+      '<div class="fixture-meta">' + UI.statusChip(f.status) + "  ·  " + UI.esc(UI.L(f, "round")) + "  ·  " + UI.fmtDate(f.date) + "  ·  " + UI.num(f.time) + "</div>" +
+      '<div class="fixture-meta muted">📍 ' + UI.esc(UI.L(f, "venue")) + "</div></article>";
   };
   UI.resultCard = function (r, teams) {
     const a = teams.find(t => t.id === r.team_a_id) || { name_bn: "?", name_en: "?", short: "?" };
@@ -245,10 +245,10 @@
       '<div class="result-team' + (winA ? " is-winner" : "") + '"><span class="team-badge" style="--c:' + UI.esc(a.color) + '">' + UI.esc(a.short) + "</span><strong>" + UI.esc(UI.L(a, "name")) + "</strong></div>" +
       '<div class="result-score">' + UI.num(r.score_a) + " â€” " + UI.num(r.score_b) + "</div>" +
       '<div class="result-team' + (winB ? " is-winner" : "") + '"><strong>' + UI.esc(UI.L(b, "name")) + "</strong><span class=\"team-badge\" style=\"--c:" + UI.esc(b.color) + '">' + UI.esc(b.short) + "</span></div></div>" +
-      '<div class="fixture-meta">' + UI.fmtDate(r.date) + " Â· " + UI.esc(UI.L(r, "venue")) + (r.potm_bn ? " Â· " + UI.esc(UI.t("potm")) + ": " + UI.esc(UI.pick(r.potm_bn, r.potm_en)) : "") + "</div></article>";
+      '<div class="fixture-meta">' + UI.fmtDate(r.date) + "  ·  " + UI.esc(UI.L(r, "venue")) + (r.potm_bn ? "  ·  " + UI.esc(UI.t("potm")) + ": " + UI.esc(UI.pick(r.potm_bn, r.potm_en)) : "") + "</div></article>";
   };
   UI.playerCard = function (p) {
-    const pos = [p.position_code, UI.L(p, "position")].filter(Boolean).map(UI.esc).join(" Â· ");
+    const pos = [p.position_code, UI.L(p, "position")].filter(Boolean).map(UI.esc).join("  ·  ");
     const cap = p.is_captain ? ' <span class="cap-badge">C</span>' : (p.is_vice_captain ? ' <span class="cap-badge">VC</span>' : "");
     const rank = (p.ranking != null && p.ranking !== "") ? ' <span class="rank-pill">#' + UI.esc(p.ranking) + "</span>" : "";
     return '<article class="card player-card"><a class="card-media avatar-media" href="player.html?p=' + encodeURIComponent(p.slug || p.id) + '" tabindex="-1" aria-hidden="true"><img loading="lazy" src="' + (p.image || UI.avatar(UI.L(p, "name"), p.id)) + '" alt=""></a>' +
